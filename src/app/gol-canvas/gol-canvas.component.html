@@ -1,0 +1,10 @@
+<canvas #canvas class="myCanvas" width="800" height="600" style="border:2px;border-color: black;">
+    <p>Add suitable fallback here.</p>
+</canvas>
+<div>
+    {{zoomLevel}} [Rows :{{displayedRow1}}-{{displayedRowN}}, and columns = {{displayedColumn1}}-{{displayedColumnN}}]
+</div>
+<div>
+    <button (click)="doZoomIn()">Zoom in</button>
+    <button (click)="doZoomOut()">Zoom out</button>
+</div>
