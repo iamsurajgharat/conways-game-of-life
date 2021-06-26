@@ -8,9 +8,9 @@ describe('GolCanvasComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ GolCanvasComponent ]
+      declarations: [GolCanvasComponent]
     })
-    .compileComponents();
+      .compileComponents();
   });
 
   beforeEach(() => {
@@ -22,4 +22,6 @@ describe('GolCanvasComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+
 });

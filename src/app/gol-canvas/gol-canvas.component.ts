@@ -49,6 +49,7 @@ export class GolCanvasComponent implements OnInit {
     }
     else {
       // throw error
+      return;
     }
 
     this.calculateCellSize(this.zoomLevel)
@@ -57,6 +58,38 @@ export class GolCanvasComponent implements OnInit {
     //this.allLives = new Map<string, CellLife>()
     //setTimeout(() => this.createNextGeneration(), this.generationDuration)
 
+  }
+
+  doZoomIn() {
+    this.doZoom(this.zoomLevel + this.zoomLevelChange)
+  }
+
+  doZoomOut() {
+    this.doZoom(this.zoomLevel - this.zoomLevelChange)
+  }
+
+  moveUp() {
+    this.centerRow = this.centerRow - this.moveChangeRate
+    this.refresh(this.cellSize)
+    //this.updateRows(this.centerRow, this.canvasHeight, this.cellSize);
+  }
+
+  moveDown() {
+    this.centerRow = this.centerRow + this.moveChangeRate
+    this.refresh(this.cellSize)
+    //this.updateRows(this.centerRow, this.canvasHeight, this.cellSize);
+  }
+
+  moveLeft() {
+    this.centerCol -= this.moveChangeRate
+    this.refresh(this.cellSize)
+    //this.updateCols(this.centerCol, this.canvasWidth, this.cellSize);
+  }
+
+  moveRight() {
+    this.centerCol += this.moveChangeRate
+    this.refresh(this.cellSize)
+    //this.updateCols(this.centerCol, this.canvasWidth, this.cellSize);
   }
 
   private refresh(side: number): void {
@@ -183,7 +216,7 @@ export class GolCanvasComponent implements OnInit {
   private createInitialState() {
 
     const centerCell = new CanvasCell(this.centerRow, this.centerCol)
-    const centerCell2 = new CanvasCell(10, 10)
+    const centerCell2 = new CanvasCell(1, 10)
 
     this.allLives.set(centerCell.getKey(), new CellLife(centerCell, true))
     this.allLives.set(centerCell2.getKey(), new CellLife(centerCell2, true))
@@ -256,7 +289,7 @@ export class GolCanvasComponent implements OnInit {
   private getNeighbours(cell: CellLife, allLives: Map<string, CellLife>): CellLife[] {
     const neighbours: CellLife[] = []
 
-    for (let newNeighbour of cell.cell.getNeghbourCellKeys()) {
+    for (let newNeighbour of cell.cell.getNeghbourCells()) {
       let oldNeighbour = allLives.get(newNeighbour.getKey())
       if (oldNeighbour) {
         neighbours.push(oldNeighbour)
@@ -333,39 +366,4 @@ export class GolCanvasComponent implements OnInit {
 
     cell.setDrawingData(x + 1, y + 1, width - 1, height - 1)
   }
-
-  doZoomIn() {
-    this.doZoom(this.zoomLevel + this.zoomLevelChange)
-  }
-
-  doZoomOut() {
-    this.doZoom(this.zoomLevel - this.zoomLevelChange)
-  }
-
-  moveUp() {
-    this.centerRow = this.centerRow - this.moveChangeRate
-    this.refresh(this.cellSize)
-    //this.updateRows(this.centerRow, this.canvasHeight, this.cellSize);
-  }
-
-  moveDown() {
-    this.centerRow = this.centerRow + this.moveChangeRate
-    this.refresh(this.cellSize)
-    //this.updateRows(this.centerRow, this.canvasHeight, this.cellSize);
-  }
-
-  moveLeft() {
-    this.centerCol -= this.moveChangeRate
-    this.refresh(this.cellSize)
-    //this.updateCols(this.centerCol, this.canvasWidth, this.cellSize);
-  }
-
-  moveRight() {
-    this.centerCol += this.moveChangeRate
-    this.refresh(this.cellSize)
-    //this.updateCols(this.centerCol, this.canvasWidth, this.cellSize);
-  }
-
-
-
 }

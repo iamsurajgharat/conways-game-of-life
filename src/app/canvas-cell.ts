@@ -13,7 +13,7 @@ export class CanvasCell {
         return this.concatForKey(this.row, this.col)
     }
 
-    getNeghbourCellKeys(): CanvasCell[] {
+    getNeghbourCells(): CanvasCell[] {
         return [
             new CanvasCell(this.row - 1, this.col - 1),              // top-left
             new CanvasCell(this.row - 1, this.col),                // top-mid
@@ -43,6 +43,6 @@ export class CanvasCell {
     }
 
     private concatForKey(x: number, y: number): string {
-        return x + "-" + y
+        return x + "|" + y
     }
 }
