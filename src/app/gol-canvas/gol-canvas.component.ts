@@ -1,6 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CanvasCell } from '../canvas-cell'
 import { CellLife } from '../cell-life'
+import { GolCanvasDrawService } from '../gol-canvas-draw.service'
 
 @Component({
   selector: 'app-gol-canvas',
@@ -11,8 +12,6 @@ export class GolCanvasComponent implements OnInit {
 
   @ViewChild('canvas', { static: true })
   private canvas!: ElementRef<HTMLCanvasElement>;
-
-  private ctx!: CanvasRenderingContext2D;
 
 
   private zoomLevelChange: 1 = 1
@@ -40,24 +39,50 @@ export class GolCanvasComponent implements OnInit {
   // all lives
   allLives = new Map<string, CellLife>()
 
-  constructor() { }
+  private timeoutToken!: any
+
+  constructor(private canvasService: GolCanvasDrawService) { }
 
   ngOnInit(): void {
-    const newCtxValue = this.canvas.nativeElement.getContext('2d')
-    if (newCtxValue != null) {
-      this.ctx = newCtxValue;
-    }
-    else {
-      // throw error
-      return;
-    }
 
+    this.canvasService.setCanvas(this.canvas, this.canvasWidth, this.canvasHeight)
     this.calculateCellSize(this.zoomLevel)
-    this.createInitialState()
     this.refresh(this.cellSize)
-    //this.allLives = new Map<string, CellLife>()
-    //setTimeout(() => this.createNextGeneration(), this.generationDuration)
+  }
 
+  createOscillator() {
+
+    // oscillator
+    const centerCell1 = new CanvasCell(this.centerRow, this.centerCol)
+    const centerCell2 = new CanvasCell(this.centerRow + 1, this.centerCol)
+    const centerCell3 = new CanvasCell(this.centerRow + 2, this.centerCol)
+    const lives = [centerCell1, centerCell2, centerCell3];
+
+    this.createInitialState(lives);
+
+  }
+
+  createGlider() {
+
+    // glider
+    const c1 = new CanvasCell(10, 10)
+    const c2 = new CanvasCell(10, 11)
+    const c3 = new CanvasCell(10, 12)
+    const c4 = new CanvasCell(9, 12)
+    const c5 = new CanvasCell(8, 11)
+    const lives = [c1, c2, c3, c4, c5];
+
+    this.createInitialState(lives);
+
+  }
+
+  start() {
+    //requestAnimationFrame(() => this.createNextGeneration())
+    this.createNextGeneration()
+  }
+
+  stop() {
+    clearTimeout(this.timeoutToken)
   }
 
   doZoomIn() {
@@ -71,49 +96,37 @@ export class GolCanvasComponent implements OnInit {
   moveUp() {
     this.centerRow = this.centerRow - this.moveChangeRate
     this.refresh(this.cellSize)
-    //this.updateRows(this.centerRow, this.canvasHeight, this.cellSize);
   }
 
   moveDown() {
     this.centerRow = this.centerRow + this.moveChangeRate
     this.refresh(this.cellSize)
-    //this.updateRows(this.centerRow, this.canvasHeight, this.cellSize);
   }
 
   moveLeft() {
     this.centerCol -= this.moveChangeRate
     this.refresh(this.cellSize)
-    //this.updateCols(this.centerCol, this.canvasWidth, this.cellSize);
   }
 
   moveRight() {
     this.centerCol += this.moveChangeRate
     this.refresh(this.cellSize)
-    //this.updateCols(this.centerCol, this.canvasWidth, this.cellSize);
   }
 
   private refresh(side: number): void {
-    if (side < 10) {
-      return
-    }
 
-    this.clearCanvas()
-    this.ctx.beginPath()
-    this.ctx.lineWidth = 0.4
-    this.ctx.strokeStyle = "black"
+    this.canvasService.clearAll()
+    this.canvasService.beginPath()
 
     const verticalCenter = this.canvasHeight / 2;
     // draw center horizontal line
-    this.ctx.moveTo(0, verticalCenter)
-    this.ctx.lineTo(this.canvasWidth, verticalCenter)
-    this.ctx.stroke()
+    this.canvasService.drawGridLine(0, verticalCenter, this.canvasWidth, verticalCenter)
+
 
     // draw horizontal lines in upper half
     let y = verticalCenter - side
     while (y >= 0) {
-      this.ctx.moveTo(0, y)
-      this.ctx.lineTo(this.canvasWidth, y)
-      this.ctx.stroke()
+      this.canvasService.drawGridLine(0, y, this.canvasWidth, y)
       y = y - side;
     }
 
@@ -123,9 +136,7 @@ export class GolCanvasComponent implements OnInit {
     // draw horizontal lines in lower half
     y = verticalCenter + side
     while (y <= this.canvasHeight) {
-      this.ctx.moveTo(0, y)
-      this.ctx.lineTo(this.canvasWidth, y)
-      this.ctx.stroke()
+      this.canvasService.drawGridLine(0, y, this.canvasWidth, y)
       y = y + side;
     }
 
@@ -134,16 +145,12 @@ export class GolCanvasComponent implements OnInit {
 
     const horizontalCenter = this.canvasWidth / 2;
     // draw center vertical line
-    this.ctx.moveTo(horizontalCenter, 0)
-    this.ctx.lineTo(horizontalCenter, this.canvasHeight)
-    this.ctx.stroke()
+    this.canvasService.drawGridLine(horizontalCenter, 0, horizontalCenter, this.canvasHeight)
 
     // draw vertical lines in left half
     let x = horizontalCenter - side
     while (x >= 0) {
-      this.ctx.moveTo(x, 0)
-      this.ctx.lineTo(x, this.canvasHeight)
-      this.ctx.stroke()
+      this.canvasService.drawGridLine(x, 0, x, this.canvasHeight)
       x = x - side;
     }
 
@@ -153,16 +160,14 @@ export class GolCanvasComponent implements OnInit {
     // draw vertical lines in right half
     x = horizontalCenter + side
     while (x <= this.canvasWidth) {
-      this.ctx.moveTo(x, 0)
-      this.ctx.lineTo(x, this.canvasHeight)
-      this.ctx.stroke()
+      this.canvasService.drawGridLine(x, 0, x, this.canvasHeight)
       x = x + side;
     }
 
     // last column width
     this.lastColWidth = (x - side) != this.canvasWidth ? this.canvasWidth - x + side : side;
 
-    this.ctx.closePath()
+    this.canvasService.closePath()
     this.updateRowsCols(this.centerRow, this.canvasHeight, this.centerCol, this.canvasWidth, this.zoomLevel)
 
     // draw lives
@@ -193,12 +198,6 @@ export class GolCanvasComponent implements OnInit {
     this.rightCol = this.leftCol + this.totalCols - 1
   }
 
-  private clearCanvas() {
-    this.ctx.beginPath()
-    this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight)
-    this.ctx.closePath()
-  }
-
   private doZoom(newZoomLevel: number) {
     if (newZoomLevel < 10) {
       return;
@@ -213,13 +212,18 @@ export class GolCanvasComponent implements OnInit {
     return this.cellSize;
   }
 
-  private createInitialState() {
+  private createInitialState(lives: CanvasCell[]) {
 
-    const centerCell = new CanvasCell(this.centerRow, this.centerCol)
-    const centerCell2 = new CanvasCell(1, 10)
+    this.stop();
+    this.canvasService.clearAll()
+    this.allLives = new Map<string, CellLife>()
 
-    this.allLives.set(centerCell.getKey(), new CellLife(centerCell, true))
-    this.allLives.set(centerCell2.getKey(), new CellLife(centerCell2, true))
+    for (let cell of lives) {
+      this.allLives.set(cell.getKey(), new CellLife(cell, true))
+    }
+
+    this.refresh(this.cellSize);
+
   }
 
   private drawAllLives() {
@@ -279,11 +283,34 @@ export class GolCanvasComponent implements OnInit {
     this.updateCellsOnCanvass(newDeads, newBorn)
 
     // schedule itself to be run in next 1s
-    setTimeout(() => this.createNextGeneration(), this.generationDuration)
+    this.timeoutToken = setTimeout(() => this.createNextGeneration(), this.generationDuration)
+    //requestAnimationFrame(() => this.createNextGeneration())
   }
 
   private processCellLife(cell: CellLife, allLives: Map<string, CellLife>): boolean {
-    return !cell.alive
+    // TODO : actual rules
+
+    const boolToNum = (x: boolean): number => x ? 1 : 0
+    const numberOfLivingNeighbours = cell.cell.getNeghbourCells().map(x => {
+      const existing = allLives.get(x.getKey())
+      if (existing) {
+        return boolToNum(existing.alive)
+      }
+
+      return 0
+    }).reduce((prev, curr, index, arr) => prev + curr)
+
+    if (cell.alive) {
+      if (numberOfLivingNeighbours < 2 || numberOfLivingNeighbours > 3) {
+        return false;
+      }
+      return true;
+    }
+    else if (numberOfLivingNeighbours == 3) {
+      return true;
+    }
+
+    return false;
   }
 
   private getNeighbours(cell: CellLife, allLives: Map<string, CellLife>): CellLife[] {
@@ -322,12 +349,8 @@ export class GolCanvasComponent implements OnInit {
 
     this.setCanvasCellCordinates(cell);
 
-    this.ctx.beginPath()
-    this.ctx.fillStyle = "rgba(255,0,0,0.75)"
-    this.ctx.fillRect(cell.x, cell.y, cell.width, cell.height)
+    this.canvasService.fillCell(cell.x, cell.y, cell.width, cell.height)
     console.log(cell.x + '|' + cell.y + '|' + cell.width + '|' + cell.height)
-    this.ctx.closePath
-
   }
 
   private clearCell(cell: CanvasCell) {
@@ -337,10 +360,8 @@ export class GolCanvasComponent implements OnInit {
 
     this.setCanvasCellCordinates(cell);
 
-    this.ctx.beginPath()
-    this.ctx.clearRect(cell.x, cell.y, cell.width, cell.height)
-    console.log("Clearing :" + cell.x + '|' + cell.y + '|' + cell.width + '|' + cell.height)
-    this.ctx.closePath
+    this.canvasService.clearCell(cell.x, cell.y, cell.width, cell.height)
+    console.log("Cleared :" + cell.x + '|' + cell.y + '|' + cell.width + '|' + cell.height)
   }
 
   private isCellOnCanvas(cell: CanvasCell): boolean {
@@ -364,6 +385,6 @@ export class GolCanvasComponent implements OnInit {
     const height = cell.row == this.topRow ? this.firstRowHeight :
       (cell.row == this.bottomRow ? this.lastRowHeight : this.cellSize)
 
-    cell.setDrawingData(x + 1, y + 1, width - 1, height - 1)
+    cell.setDrawingData(x, y, width, height)
   }
 }
