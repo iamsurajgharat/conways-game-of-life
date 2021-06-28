@@ -1,25 +1,27 @@
-<canvas #canvas class="myCanvas" width="800" height="600">
+<canvas #canvas class="myCanvas" width="1500" height="1000">
     <p>Add suitable fallback here.</p>
 </canvas>
-<div>
-    {{zoomLevel}} [Rows :{{topRow}} to {{bottomRow}}, and columns =
-    {{leftCol}} to {{rightCol}}]
-    <p>
-        Total rows : {{totalRows}}
-        Total cols : {{totalCols}}
-    </p>
-</div>
-<div>
-    <button (click)="createOscillator()">Oscillator</button>
-    <button (click)="createGlider()">Glider</button>
-</div>
-<div>
-    <button (click)="start()">Start</button>
-    <button (click)="stop()">Stop</button>
-    <button (click)="doZoomIn()">Zoom in</button>
-    <button (click)="doZoomOut()">Zoom out</button>
-    <button (click)="moveUp()">Pan up</button>
-    <button (click)="moveDown()">Pan Down</button>
-    <button (click)="moveLeft()">Pan Left</button>
-    <button (click)="moveRight()">Pan Right</button>
+<div class="canvas-controls">
+    <div>
+        {{zoomLevel}} [Rows :{{topRow}} to {{bottomRow}}, and columns =
+        {{leftCol}} to {{rightCol}}]
+        <p>
+            Total rows : {{totalRows}}
+            Total cols : {{totalCols}}
+        </p>
+    </div>
+    <div>
+        <button (click)="createOscillator()">Oscillator</button>
+        <button (click)="createGlider()">Glider</button>
+    </div>
+    <div>
+        <button (click)="start()">Start</button>
+        <button (click)="stop()">Stop</button>
+        <button (click)="doZoomIn()">Zoom in</button>
+        <button (click)="doZoomOut()">Zoom out</button>
+        <button (click)="moveUp()">Pan up</button>
+        <button (click)="moveDown()">Pan Down</button>
+        <button (click)="moveLeft()">Pan Left</button>
+        <button (click)="moveRight()">Pan Right</button>
+    </div>
 </div>

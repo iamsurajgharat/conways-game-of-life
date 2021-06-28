@@ -1,4 +1,12 @@
 .myCanvas{
     border-style: solid;
     border-color: red;
+    width: 98%;
+    height: 85%;
+    margin:auto;
+    
+}
+
+.canvas-controls{
+    height: 15%;
 }

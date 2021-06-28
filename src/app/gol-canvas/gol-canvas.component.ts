@@ -20,8 +20,8 @@ export class GolCanvasComponent implements OnInit {
 
   // canvas properties
   zoomLevel = 25
-  canvasWidth = 800
-  canvasHeight = 600
+  canvasWidth = 1500
+  canvasHeight = 1000
   cellSize = 35
   topRow = 1
   bottomRow = 10
@@ -44,7 +44,7 @@ export class GolCanvasComponent implements OnInit {
   constructor(private canvasService: GolCanvasDrawService) { }
 
   ngOnInit(): void {
-
+    //this.canvas.nativeElement.style.height = '500px'
     this.canvasService.setCanvas(this.canvas, this.canvasWidth, this.canvasHeight)
     this.calculateCellSize(this.zoomLevel)
     this.refresh(this.cellSize)
