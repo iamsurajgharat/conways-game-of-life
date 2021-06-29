@@ -12,8 +12,8 @@ export class GolCanvasComponent implements OnInit {
   @ViewChild('canvas', { static: true })
   private canvas!: ElementRef<HTMLCanvasElement>;
 
-  private zoomLevelChange: 1 = 1;
-  private moveChangeRate: number = 5;
+  private zoomLevelChange: number = 3;
+  private moveChangeRate: number = 10;
   private generationDuration = 3000;
 
   // canvas properties
@@ -52,11 +52,11 @@ export class GolCanvasComponent implements OnInit {
       this.canvasWidth,
       this.canvasHeight
     );
-    this.setInitValues()
+    this.setInitValues();
     this.refresh(this.cellSize);
   }
 
-  private setInitValues(){
+  private setInitValues() {
     this.zoomLevel = 35;
     this.calculateCellSize(this.zoomLevel);
     this.canvasWidth = 1500;
@@ -119,37 +119,67 @@ export class GolCanvasComponent implements OnInit {
   }
 
   moveUp() {
-    this.verticalCenter+= this.moveChangeRate
-    const originalVerticalCenter = this.canvasHeight/2
-    //debugger;
-    if((this.verticalCenter - originalVerticalCenter) >= this.cellSize)
-    {
+    this.verticalCenter += this.moveChangeRate;
+    const originalVerticalCenter = this.canvasHeight / 2;
+    if (this.verticalCenter - originalVerticalCenter >= this.cellSize) {
       this.centerRow = this.centerRow - 1;
       this.verticalCenter = this.verticalCenter - this.cellSize;
     }
-    //this.verticalOffset += this.moveChangeRate
-    
     this.refresh(this.cellSize);
   }
 
   moveDown() {
-    this.centerRow = this.centerRow + this.moveChangeRate;
+    this.verticalCenter -= this.moveChangeRate;
+    const originalVerticalCenter = this.canvasHeight / 2;
+    if ((originalVerticalCenter - this.verticalCenter) >= this.cellSize) {
+      this.centerRow = this.centerRow + 1;
+      this.verticalCenter = this.verticalCenter + this.cellSize;
+    }
     this.refresh(this.cellSize);
   }
 
   moveLeft() {
-    this.centerCol -= this.moveChangeRate;
+    this.horizontalCenter += this.moveChangeRate;
+    const originalHorizontalCenter = this.canvasWidth / 2;
+    if (this.horizontalCenter - originalHorizontalCenter >= this.cellSize) {
+      this.centerCol = this.centerCol - 1;
+      this.horizontalCenter = this.horizontalCenter - this.cellSize;
+    }
     this.refresh(this.cellSize);
   }
 
   moveRight() {
-    this.centerCol += this.moveChangeRate;
+    this.horizontalCenter -= this.moveChangeRate;
+    const originalHorizontalCenter = this.canvasWidth / 2;
+    if ((originalHorizontalCenter - this.horizontalCenter) >= this.cellSize) {
+      this.centerCol = this.centerCol + 1;
+      this.horizontalCenter = this.horizontalCenter + this.cellSize;
+    }
     this.refresh(this.cellSize);
   }
 
   private refresh(side: number): void {
     this.canvasService.clearAll();
     this.canvasService.beginPath();
+
+    this.drawHorizontalLines(side);
+    this.drawVerticalLines(side);
+
+    this.canvasService.closePath();
+
+    /*this.updateRowsCols(
+      this.centerRow,
+      this.canvasHeight,
+      this.centerCol,
+      this.canvasWidth,
+      this.zoomLevel
+    );*/
+
+    // draw lives
+    this.drawAllLives();
+  }
+
+  private drawHorizontalLines(side: number) {
 
     // draw center horizontal line
     this.canvasService.drawGridLine(
@@ -161,28 +191,40 @@ export class GolCanvasComponent implements OnInit {
 
     // draw horizontal lines in upper half
     let y = this.verticalCenter - side;
-    while (y >= 0) {
+    this.topRow = this.centerRow - 1;
+    while (y > 0) {
       this.canvasService.drawGridLine(0, y, this.canvasWidth, y);
       y = y - side;
+      this.topRow -= 1;
     }
 
+    // negate last sub
+    this.topRow += 1;
+
     // first row height
-    this.firstRowHeight = y + side != 0 ? y + side : side;
+    this.firstRowHeight = y < 0 ? y + side : side;
 
     // draw horizontal lines in lower half
     y = this.verticalCenter + side;
-    while (y <= this.canvasHeight) {
+    this.bottomRow = this.centerRow + 2;
+    while (y < this.canvasHeight) {
       this.canvasService.drawGridLine(0, y, this.canvasWidth, y);
       y = y + side;
+      this.bottomRow += 1;
     }
 
-    // last row height
-    this.lastRowHeight =
-      y - side != this.canvasHeight ? this.canvasHeight - y + side : side;
+    this.bottomRow -= 1;
 
+    // last row height
+    this.lastRowHeight = y > this.canvasHeight ? y - this.canvasHeight : side;
+
+    this.totalRows = this.bottomRow - this.topRow + 1;
+  }
+
+  private drawVerticalLines(side: number) {
     // draw center vertical line
     this.canvasService.drawGridLine(
-    //const verticalCenter = this.canvasHeight / 2;
+      //const verticalCenter = this.canvasHeight / 2;
       this.horizontalCenter,
       0,
       this.horizontalCenter,
@@ -191,36 +233,35 @@ export class GolCanvasComponent implements OnInit {
 
     // draw vertical lines in left half
     let x = this.horizontalCenter - side;
-    while (x >= 0) {
+    this.leftCol = this.centerCol - 1
+    while (x > 0) {
       this.canvasService.drawGridLine(x, 0, x, this.canvasHeight);
       x = x - side;
+      this.leftCol -=  1
     }
 
+    // negate last sub
+    this.leftCol += 1;
+
     // first column width
-    this.firstColWidth = x + side != 0 ? x + side : side;
+    this.firstColWidth = x < 0 ? x + side : side;
 
     // draw vertical lines in right half
     x = this.horizontalCenter + side;
-    while (x <= this.canvasWidth) {
+    this.rightCol = this.centerCol + 2
+    while (x < this.canvasWidth) {
       this.canvasService.drawGridLine(x, 0, x, this.canvasHeight);
       x = x + side;
+      this.rightCol += 1
     }
+
+    this.rightCol -= 1
 
     // last column width
     this.lastColWidth =
-      x - side != this.canvasWidth ? this.canvasWidth - x + side : side;
+      x > this.canvasWidth ? x - this.canvasWidth : side;
 
-    this.canvasService.closePath();
-    this.updateRowsCols(
-      this.centerRow,
-      this.canvasHeight,
-      this.centerCol,
-      this.canvasWidth,
-      this.zoomLevel
-    );
-
-    // draw lives
-    this.drawAllLives();
+      this.totalCols = this.rightCol - this.leftCol + 1;
   }
 
   private updateRowsCols(
@@ -235,23 +276,36 @@ export class GolCanvasComponent implements OnInit {
   }
 
   private updateRows(centerRow: number, height: number, side: number) {
-    const verticalHalf = height / 2;
-    const completeCells = Math.floor(verticalHalf / side) * 2;
-    const anyIncompleteCell = verticalHalf % side != 0;
+    const completeUpperRows = Math.floor(this.verticalCenter / side);
+    this.firstRowHeight = this.verticalCenter % side || side;
     this.topRow =
-      centerRow - completeCells / 2 - 1 - (anyIncompleteCell ? 1 : 0);
-    this.totalRows = completeCells + (anyIncompleteCell ? 2 : 0);
-    this.bottomRow = this.topRow + this.totalRows - 1;
+      centerRow - completeUpperRows + 1 - (this.firstRowHeight != side ? 1 : 0);
+
+    const completeLowerRows = Math.floor((height - this.verticalCenter) / side);
+    this.lastRowHeight = (height - this.verticalCenter) % side || side;
+    this.bottomRow =
+      centerRow + completeLowerRows + (this.lastRowHeight != side ? 1 : 0);
+
+    this.totalRows = this.bottomRow - this.topRow + 1;
   }
 
   private updateCols(centerCol: number, width: number, side: number) {
-    const horizontalHalf = width / 2;
-    const completeCells = Math.floor(horizontalHalf / side) * 2;
-    const anyIncompleteCell = horizontalHalf % side != 0;
+    const completeLeftColumns = Math.floor(this.horizontalCenter / side);
+    this.firstColWidth = this.horizontalCenter % side || side;
     this.leftCol =
-      centerCol - completeCells / 2 - 1 - (anyIncompleteCell ? 1 : 0);
-    this.totalCols = completeCells + (anyIncompleteCell ? 2 : 0);
-    this.rightCol = this.leftCol + this.totalCols - 1;
+      centerCol -
+      completeLeftColumns +
+      1 -
+      (this.firstColWidth != side ? 1 : 0);
+
+    const completeRightColumns = Math.floor(
+      (width - this.horizontalCenter) / side
+    );
+    this.lastColWidth = (width - this.horizontalCenter) % side || side;
+    this.rightCol =
+      centerCol + completeRightColumns + (this.lastRowHeight != side ? 1 : 0);
+
+    this.totalCols = this.rightCol - this.leftCol + 1;
   }
 
   private doZoom(newZoomLevel: number) {
