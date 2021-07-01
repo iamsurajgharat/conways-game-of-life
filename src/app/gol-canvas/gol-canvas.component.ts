@@ -12,78 +12,52 @@ export class GolCanvasComponent implements OnInit {
   @ViewChild('canvas', { static: true })
   private canvas!: ElementRef<HTMLCanvasElement>;
 
-  private zoomLevelChange: number = 3;
-  private moveChangeRate: number = 10;
-  private generationDuration = 3000;
+  private zoomLevelChange: number = 5;
+  private moveChangeRate: number = 20;
+  private generationDuration = 300;
 
   // canvas properties
   zoomLevel = 25;
-  canvasWidth = 1500;
-  canvasHeight = 1000;
-  cellSize = 35;
-  topRow = 1;
-  bottomRow = 10;
-  leftCol = 1;
-  rightCol = 10;
-  totalRows = 0;
-  totalCols = 0;
-  centerRow = 10;
-  centerCol = 15;
-  verticalCenter = this.canvasHeight / 2;
-  horizontalCenter = this.canvasWidth / 2;
-  verticalOffset = 0;
-  horizontalOffset = 0;
-  firstRowHeight = this.cellSize;
-  firstColWidth = this.cellSize;
-  lastRowHeight = this.cellSize;
-  lastColWidth = this.cellSize;
+  gridWidth = 1500;
+  gridHeight = 600;
 
   // all lives
   allLives = new Map<string, CellLife>();
 
   private timeoutToken!: any;
 
-  constructor(private canvasService: GolCanvasDrawService) {}
+  constructor(private canvasService: GolCanvasDrawService) {
+    this.setInitValues(this.gridWidth, this.gridHeight, this.zoomLevel, this.generationDuration)
+  }
 
   ngOnInit(): void {
     //this.canvas.nativeElement.style.height = '500px'
     this.canvasService.setCanvas(
       this.canvas,
-      this.canvasWidth,
-      this.canvasHeight
+      this.gridWidth,
+      this.gridHeight,
+      this.zoomLevel
     );
-    this.setInitValues();
-    this.refresh(this.cellSize);
+
+    //this.refresh(this.cellSize);
   }
 
-  private setInitValues() {
-    this.zoomLevel = 35;
-    this.calculateCellSize(this.zoomLevel);
-    this.canvasWidth = 1500;
-    this.canvasHeight = 1000;
-    this.topRow = 1;
-    this.bottomRow = 10;
-    this.leftCol = 1;
-    this.rightCol = 10;
-    this.totalRows = 0;
-    this.totalCols = 0;
-    this.centerRow = 10;
-    this.centerCol = 15;
-    this.verticalCenter = this.canvasHeight / 2;
-    this.horizontalCenter = this.canvasWidth / 2;
-    this.verticalOffset = 0;
-    this.horizontalOffset = 0;
-    this.firstRowHeight = this.cellSize;
-    this.firstColWidth = this.cellSize;
-    this.lastRowHeight = this.cellSize;
-    this.lastColWidth = this.cellSize;
+  setInitValues(gw: number, gh: number, zl: number, duration: number) {
+    this.gridWidth = gw
+    this.gridHeight = gh
+    this.zoomLevel = zl
+    this.generationDuration = duration
+  }
+
+  getGrid() {
+    return this.canvasService.getGrid()
   }
 
   createOscillator() {
     // oscillator
-    const centerCell1 = new CanvasCell(this.centerRow, this.centerCol);
-    const centerCell2 = new CanvasCell(this.centerRow + 1, this.centerCol);
-    const centerCell3 = new CanvasCell(this.centerRow + 2, this.centerCol);
+    const centerCell1 = new CanvasCell(this.getGrid().centerRow - 1, this.getGrid().centerCol);
+    const centerCell2 = new CanvasCell(this.getGrid().centerRow, this.getGrid().centerCol);
+    const centerCell3 = new CanvasCell(this.getGrid().centerRow + 1, this.getGrid().centerCol);
     const lives = [centerCell1, centerCell2, centerCell3];
 
     this.createInitialState(lives);
@@ -91,11 +65,12 @@ export class GolCanvasComponent implements OnInit {
 
   createGlider() {
     // glider
-    const c1 = new CanvasCell(10, 10);
-    const c2 = new CanvasCell(10, 11);
-    const c3 = new CanvasCell(10, 12);
-    const c4 = new CanvasCell(9, 12);
-    const c5 = new CanvasCell(8, 11);
+    const c1 = new CanvasCell(this.getGrid().centerRow - 1, this.getGrid().centerCol + 1);
+    const c2 = new CanvasCell(this.getGrid().centerRow, this.getGrid().centerCol - 1);
+    const c3 = new CanvasCell(this.getGrid().centerRow, this.getGrid().centerCol + 1);
+    const c4 = new CanvasCell(this.getGrid().centerRow + 1, this.getGrid().centerCol);
+    const c5 = new CanvasCell(this.getGrid().centerRow + 1, this.getGrid().centerCol + 1);
+
     const lives = [c1, c2, c3, c4, c5];
 
     this.createInitialState(lives);
@@ -119,224 +94,54 @@ export class GolCanvasComponent implements OnInit {
   }
 
   moveUp() {
-    this.verticalCenter += this.moveChangeRate;
-    const originalVerticalCenter = this.canvasHeight / 2;
-    if (this.verticalCenter - originalVerticalCenter >= this.cellSize) {
-      this.centerRow = this.centerRow - 1;
-      this.verticalCenter = this.verticalCenter - this.cellSize;
-    }
-    this.refresh(this.cellSize);
+    this.canvasService.moveUp(this.moveChangeRate)
+    this.drawAllLives()
   }
 
   moveDown() {
-    this.verticalCenter -= this.moveChangeRate;
-    const originalVerticalCenter = this.canvasHeight / 2;
-    if ((originalVerticalCenter - this.verticalCenter) >= this.cellSize) {
-      this.centerRow = this.centerRow + 1;
-      this.verticalCenter = this.verticalCenter + this.cellSize;
-    }
-    this.refresh(this.cellSize);
+    this.canvasService.moveDown(this.moveChangeRate)
+    this.drawAllLives()
   }
 
   moveLeft() {
-    this.horizontalCenter += this.moveChangeRate;
-    const originalHorizontalCenter = this.canvasWidth / 2;
-    if (this.horizontalCenter - originalHorizontalCenter >= this.cellSize) {
-      this.centerCol = this.centerCol - 1;
-      this.horizontalCenter = this.horizontalCenter - this.cellSize;
-    }
-    this.refresh(this.cellSize);
+    this.canvasService.moveLeft(this.moveChangeRate)
+    this.drawAllLives()
   }
 
   moveRight() {
-    this.horizontalCenter -= this.moveChangeRate;
-    const originalHorizontalCenter = this.canvasWidth / 2;
-    if ((originalHorizontalCenter - this.horizontalCenter) >= this.cellSize) {
-      this.centerCol = this.centerCol + 1;
-      this.horizontalCenter = this.horizontalCenter + this.cellSize;
-    }
-    this.refresh(this.cellSize);
-  }
-
-  private refresh(side: number): void {
-    this.canvasService.clearAll();
-    this.canvasService.beginPath();
-
-    this.drawHorizontalLines(side);
-    this.drawVerticalLines(side);
-
-    this.canvasService.closePath();
-
-    /*this.updateRowsCols(
-      this.centerRow,
-      this.canvasHeight,
-      this.centerCol,
-      this.canvasWidth,
-      this.zoomLevel
-    );*/
-
-    // draw lives
-    this.drawAllLives();
-  }
-
-  private drawHorizontalLines(side: number) {
-
-    // draw center horizontal line
-    this.canvasService.drawGridLine(
-      0,
-      this.verticalCenter,
-      this.canvasWidth,
-      this.verticalCenter
-    );
-
-    // draw horizontal lines in upper half
-    let y = this.verticalCenter - side;
-    this.topRow = this.centerRow - 1;
-    while (y > 0) {
-      this.canvasService.drawGridLine(0, y, this.canvasWidth, y);
-      y = y - side;
-      this.topRow -= 1;
-    }
-
-    // negate last sub
-    this.topRow += 1;
-
-    // first row height
-    this.firstRowHeight = y < 0 ? y + side : side;
-
-    // draw horizontal lines in lower half
-    y = this.verticalCenter + side;
-    this.bottomRow = this.centerRow + 2;
-    while (y < this.canvasHeight) {
-      this.canvasService.drawGridLine(0, y, this.canvasWidth, y);
-      y = y + side;
-      this.bottomRow += 1;
-    }
-
-    this.bottomRow -= 1;
-
-    // last row height
-    this.lastRowHeight = y > this.canvasHeight ? y - this.canvasHeight : side;
-
-    this.totalRows = this.bottomRow - this.topRow + 1;
-  }
-
-  private drawVerticalLines(side: number) {
-    // draw center vertical line
-    this.canvasService.drawGridLine(
-      //const verticalCenter = this.canvasHeight / 2;
-      this.horizontalCenter,
-      0,
-      this.horizontalCenter,
-      this.canvasHeight
-    );
-
-    // draw vertical lines in left half
-    let x = this.horizontalCenter - side;
-    this.leftCol = this.centerCol - 1
-    while (x > 0) {
-      this.canvasService.drawGridLine(x, 0, x, this.canvasHeight);
-      x = x - side;
-      this.leftCol -=  1
-    }
-
-    // negate last sub
-    this.leftCol += 1;
-
-    // first column width
-    this.firstColWidth = x < 0 ? x + side : side;
-
-    // draw vertical lines in right half
-    x = this.horizontalCenter + side;
-    this.rightCol = this.centerCol + 2
-    while (x < this.canvasWidth) {
-      this.canvasService.drawGridLine(x, 0, x, this.canvasHeight);
-      x = x + side;
-      this.rightCol += 1
-    }
-
-    this.rightCol -= 1
-
-    // last column width
-    this.lastColWidth =
-      x > this.canvasWidth ? x - this.canvasWidth : side;
-
-      this.totalCols = this.rightCol - this.leftCol + 1;
-  }
-
-  private updateRowsCols(
-    centerRow: number,
-    height: number,
-    centerCol: number,
-    width: number,
-    side: number
-  ) {
-    this.updateRows(centerRow, height, side);
-    this.updateCols(centerCol, width, side);
-  }
-
-  private updateRows(centerRow: number, height: number, side: number) {
-    const completeUpperRows = Math.floor(this.verticalCenter / side);
-    this.firstRowHeight = this.verticalCenter % side || side;
-    this.topRow =
-      centerRow - completeUpperRows + 1 - (this.firstRowHeight != side ? 1 : 0);
-
-    const completeLowerRows = Math.floor((height - this.verticalCenter) / side);
-    this.lastRowHeight = (height - this.verticalCenter) % side || side;
-    this.bottomRow =
-      centerRow + completeLowerRows + (this.lastRowHeight != side ? 1 : 0);
-
-    this.totalRows = this.bottomRow - this.topRow + 1;
-  }
-
-  private updateCols(centerCol: number, width: number, side: number) {
-    const completeLeftColumns = Math.floor(this.horizontalCenter / side);
-    this.firstColWidth = this.horizontalCenter % side || side;
-    this.leftCol =
-      centerCol -
-      completeLeftColumns +
-      1 -
-      (this.firstColWidth != side ? 1 : 0);
-
-    const completeRightColumns = Math.floor(
-      (width - this.horizontalCenter) / side
-    );
-    this.lastColWidth = (width - this.horizontalCenter) % side || side;
-    this.rightCol =
-      centerCol + completeRightColumns + (this.lastRowHeight != side ? 1 : 0);
-
-    this.totalCols = this.rightCol - this.leftCol + 1;
+    this.canvasService.moveRight(this.moveChangeRate)
+    this.drawAllLives()
   }
 
   private doZoom(newZoomLevel: number) {
-    if (newZoomLevel < 10) {
+    if (newZoomLevel < 2) {
       return;
     }
     this.zoomLevel = newZoomLevel;
-    this.calculateCellSize(this.zoomLevel);
-    this.refresh(this.cellSize);
-  }
-
-  private calculateCellSize(zoomLevel: number) {
-    this.cellSize = zoomLevel;
-    return this.cellSize;
+    this.canvasService.setCellSize(newZoomLevel)
+    this.drawAllLives()
   }
 
   private createInitialState(lives: CanvasCell[]) {
+    // stop the ongoing execution
     this.stop();
-    this.canvasService.clearAll();
-    this.allLives = new Map<string, CellLife>();
 
+    // reset lives data
+    this.allLives = new Map<string, CellLife>();
     for (let cell of lives) {
       this.allLives.set(cell.getKey(), new CellLife(cell, true));
     }
 
-    this.refresh(this.cellSize);
+    // put new lives on grid
+    this.drawAllLives()
   }
 
   private drawAllLives() {
+    // clear the grid
+    this.canvasService.resetGrid()
+
     for (let life of this.allLives) {
-      this.fillCell(life[1].cell);
+      this.canvasService.fillCell(life[1].cell.row, life[1].cell.col)
     }
   }
 
@@ -344,44 +149,19 @@ export class GolCanvasComponent implements OnInit {
     //this.fillCell(new CanvasCell(18, 25))
 
     // process each life in allLives state, and its surroundings
-    const newDeads = [];
-    const newBorn = [];
+    const newDeads: CanvasCell[] = [];
+    const newBorn: CanvasCell[] = [];
     const processedLives = new Set<string>();
     const newGeneration = new Map<string, CellLife>();
-    for (let key of this.allLives.keys()) {
-      const life = this.allLives.get(key);
-      if (!life) {
-        continue;
-      }
 
-      const nextLifeStatus = this.processCellLife(life, this.allLives);
-      if (nextLifeStatus == false) {
-        newDeads.push(life.cell);
-      } else {
-        newGeneration.set(key, life);
-      }
+    for (let [key, life] of this.allLives) {
 
-      processedLives.add(key);
+      this.calculateNextStateForCell(key, life, processedLives, newDeads, newBorn, newGeneration)
 
-      for (let neighbour of this.getNeighbours(life, this.allLives).filter(
-        (x) => !processedLives.has(x.cell.getKey())
-      )) {
-        const nextLifeStatusForNeighbour = this.processCellLife(
-          neighbour,
-          this.allLives
-        );
+      // process neighbours
+      for (let neighbour of this.getNeighbours(life, this.allLives)) {
         const key2 = neighbour.cell.getKey();
-        if (nextLifeStatusForNeighbour != neighbour.alive) {
-          neighbour.alive = nextLifeStatusForNeighbour;
-          if (nextLifeStatusForNeighbour) {
-            newBorn.push(neighbour.cell);
-            newGeneration.set(key2, neighbour);
-          } else {
-            newDeads.push(neighbour.cell);
-          }
-        }
-
-        processedLives.add(key2);
+        this.calculateNextStateForCell(key2, neighbour, processedLives, newDeads, newBorn, newGeneration)
       }
     }
 
@@ -399,7 +179,29 @@ export class GolCanvasComponent implements OnInit {
     //requestAnimationFrame(() => this.createNextGeneration())
   }
 
-  private processCellLife(
+  private calculateNextStateForCell(key: string, life: CellLife, processedLives: Set<string>, newDeads: CanvasCell[], newBorn: CanvasCell[], newGeneration: Map<string, CellLife>) {
+    if (processedLives.has(key)) {
+      return
+    }
+    const nextLifeStatus = this.evaluateLifeRules(life, this.allLives);
+    processedLives.add(key);
+
+    if (nextLifeStatus) {
+      // born now
+      if (!life.alive) {
+        newBorn.push(life.cell)
+      }
+
+      newGeneration.set(key, new CellLife(life.cell, true))
+    }
+    // died now
+    else if (life.alive) {
+      newDeads.push(life.cell)
+    }
+
+  }
+
+  private evaluateLifeRules(
     cell: CellLife,
     allLives: Map<string, CellLife>
   ): boolean {
@@ -434,15 +236,10 @@ export class GolCanvasComponent implements OnInit {
     cell: CellLife,
     allLives: Map<string, CellLife>
   ): CellLife[] {
-    const neighbours: CellLife[] = [];
 
+    const neighbours: CellLife[] = [];
     for (let newNeighbour of cell.cell.getNeghbourCells()) {
-      let oldNeighbour = allLives.get(newNeighbour.getKey());
-      if (oldNeighbour) {
-        neighbours.push(oldNeighbour);
-      } else {
-        neighbours.push(new CellLife(newNeighbour, false));
-      }
+      neighbours.push(new CellLife(newNeighbour, allLives.has(newNeighbour.getKey())));
     }
 
     return neighbours;
@@ -454,72 +251,12 @@ export class GolCanvasComponent implements OnInit {
   ) {
     // remove
     for (let cell of cellsToClear) {
-      this.clearCell(cell);
+      this.canvasService.clearCell(cell.row, cell.col);
     }
 
     // create
     for (let cell of cellToDraw) {
-      this.fillCell(cell);
+      this.canvasService.fillCell(cell.row, cell.col);
     }
-  }
-
-  private fillCell(cell: CanvasCell) {
-    if (!this.isCellOnCanvas(cell)) {
-      return;
-    }
-
-    this.setCanvasCellCordinates(cell);
-
-    this.canvasService.fillCell(cell.x, cell.y, cell.width, cell.height);
-    console.log(cell.x + '|' + cell.y + '|' + cell.width + '|' + cell.height);
-  }
-
-  private clearCell(cell: CanvasCell) {
-    if (!this.isCellOnCanvas(cell)) {
-      return;
-    }
-
-    this.setCanvasCellCordinates(cell);
-
-    this.canvasService.clearCell(cell.x, cell.y, cell.width, cell.height);
-    console.log(
-      'Cleared :' + cell.x + '|' + cell.y + '|' + cell.width + '|' + cell.height
-    );
-  }
-
-  private isCellOnCanvas(cell: CanvasCell): boolean {
-    return (
-      cell.row >= this.topRow &&
-      cell.row <= this.bottomRow &&
-      cell.col >= this.leftCol &&
-      cell.col <= this.rightCol
-    );
-  }
-
-  private setCanvasCellCordinates(cell: CanvasCell): void {
-    const xoffset = cell.col > this.leftCol ? this.firstColWidth : 0;
-    const xcols =
-      cell.col <= this.leftCol + 1 ? 0 : cell.col - this.leftCol - 1;
-    const yoffset = cell.row > this.topRow ? this.firstRowHeight : 0;
-    const ycols = cell.row <= this.topRow + 1 ? 0 : cell.row - this.topRow - 1;
-
-    const x = xoffset + xcols * this.cellSize;
-    const y = yoffset + ycols * this.cellSize;
-
-    const width =
-      cell.col == this.leftCol
-        ? this.firstColWidth
-        : cell.col == this.rightCol
-        ? this.lastColWidth
-        : this.cellSize;
-
-    const height =
-      cell.row == this.topRow
-        ? this.firstRowHeight
-        : cell.row == this.bottomRow
-        ? this.lastRowHeight
-        : this.cellSize;
-
-    cell.setDrawingData(x, y, width, height);
   }
 }

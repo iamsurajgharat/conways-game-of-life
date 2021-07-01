@@ -1,13 +1,15 @@
-<canvas #canvas class="myCanvas" width="1500" height="1000">
+<canvas #canvas class="myCanvas" width="1500" height="600">
     <p>Add suitable fallback here.</p>
 </canvas>
 <div class="canvas-controls">
     <div>
-        {{zoomLevel}} [Rows :{{topRow}} to {{bottomRow}}, and columns =
-        {{leftCol}} to {{rightCol}}]
+        {{zoomLevel}} [Rows :{{getGrid().topRow}} to {{getGrid().bottomRow}}, and columns =
+        {{getGrid().leftCol}} to {{getGrid().rightCol}}]
         <p>
-            Total rows : {{totalRows}}
-            Total cols : {{totalCols}}
+            Total rows : {{getGrid().getRowsCount()}}
+            Total cols : {{getGrid().getColsCount()}}
+            &nbsp;Top row height : {{getGrid().topRowHeight}}
+            &nbsp;Bottom row height : {{getGrid().bottomRowHeight}}
         </p>
     </div>
     <div>
