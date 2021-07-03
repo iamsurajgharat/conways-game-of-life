@@ -117,6 +117,7 @@ export class GolCanvasComponent implements OnInit {
     if (newZoomLevel < 2) {
       return;
     }
+
     this.zoomLevel = newZoomLevel;
     this.canvasService.setCellSize(newZoomLevel)
     this.drawAllLives()
@@ -132,14 +133,14 @@ export class GolCanvasComponent implements OnInit {
       this.allLives.set(cell.getKey(), new CellLife(cell, true));
     }
 
+    // clear the grid
+    this.canvasService.resetGrid()
+
     // put new lives on grid
     this.drawAllLives()
   }
 
   private drawAllLives() {
-    // clear the grid
-    this.canvasService.resetGrid()
-
     for (let life of this.allLives) {
       this.canvasService.fillCell(life[1].cell.row, life[1].cell.col)
     }

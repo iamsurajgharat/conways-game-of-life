@@ -1,9 +1,6 @@
 import { ElementRef } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { CanvasCell } from '../canvas-cell';
-import { CellLife } from '../cell-life';
 import { GolCanvasDrawService } from '../gol-canvas-draw.service';
-
 import { GolCanvasComponent } from './gol-canvas.component';
 
 describe('GolCanvasComponent', () => {
@@ -36,17 +33,6 @@ describe('GolCanvasComponent-Glider', () => {
   let spyCanvasDrawService = new GolCanvasDrawService()
 
   beforeEach(() => {
-    /*spyCanvasDrawService = jasmine.createSpyObj('GolCanvasDrawService', [
-      'setCanvas',
-      'clearAll',
-      'beginPath',
-      'closePath',
-      'drawGridLine',
-      'fillCell',
-      'clearCell',
-      'getGrid'
-    ]);*/
-
     // configure TestBed to create component with mock canvas service
     TestBed.configureTestingModule({
       declarations: [GolCanvasComponent],
@@ -94,10 +80,7 @@ describe('GolCanvasComponent-Glider', () => {
     setConvasSpy.calls.reset();
   }
 
-  it('should start correctly with empty grid', testSetup);
-
-  it('createGlider should create glider correctly', fakeAsync(() => {
-
+  function createGliderTest(){
     // arrange
     testSetup()
 
@@ -107,7 +90,6 @@ describe('GolCanvasComponent-Glider', () => {
     const clearCellSpy = spyOn(spyCanvasDrawService, 'clearCell').and.callThrough()
     
     // act - create glider in below position
-    
     component.createGlider()
 
     // assure
@@ -129,6 +111,20 @@ describe('GolCanvasComponent-Glider', () => {
     // reset spy data
     resetGridSpy.calls.reset()
     fillCellSpy.calls.reset()
+  }
+
+  it('app should start with empty grid', testSetup);
+
+  it('app should create glider correctly', createGliderTest);
+
+  it('should be created and moved correctly', fakeAsync(() => {
+
+    createGliderTest()
+
+    spyCanvasDrawService.getGrid = jasmine.createSpy().and.callThrough()
+    const resetGridSpy = spyCanvasDrawService.resetGrid = jasmine.createSpy().and.callThrough()
+    const fillCellSpy = spyCanvasDrawService.fillCell = jasmine.createSpy().and.callThrough()
+    const clearCellSpy = spyCanvasDrawService.clearCell = jasmine.createSpy().and.callThrough()
 
     // act 2 - the glider should move to next generation
     // and so, there should two new clear calls and two new fill calls
@@ -143,7 +139,7 @@ describe('GolCanvasComponent-Glider', () => {
     component.start()
     
     // assure
-    // there should two deaths and two births
+    // there should be two deaths and two births
     // 00 is death, and 11 is birth in below illustration
     // ## is unchanged
     // 
@@ -171,7 +167,7 @@ describe('GolCanvasComponent-Glider', () => {
     tick(3000)
 
     // assure
-    // there should two deaths and two births
+    // there should be two deaths and two births
     // 00 is death, and 11 is birth in below illustration
     // ## is unchanged
     // 
@@ -190,6 +186,131 @@ describe('GolCanvasComponent-Glider', () => {
     expect(clearCellSpy).toHaveBeenCalledWith(9,10);
     expect(clearCellSpy).toHaveBeenCalledWith(10,11);
 
+    // reset spy data
+    resetGridSpy.calls.reset()
+    fillCellSpy.calls.reset()
+    clearCellSpy.calls.reset()
+
+     // act 4
+     tick(3000)
+
+     // assure
+     // there should be two deaths and two births
+     // 00 is death, and 11 is birth in below illustration
+     // ## is unchanged
+     // 
+     //      08 09 10 11 12 13
+     //  08 |__|__|__|__|__|__|
+     //  09 |__|__|__|00|__|__|
+     //  10 |__|__|11|__|##|__|
+     //  11 |__|__|00|##|##|__|
+     //  12 |__|__|__|11|__|__|
+     //  13 |__|__|__|__|__|__| 
+
+     expect(resetGridSpy).toHaveBeenCalledTimes(0)
+     expect(fillCellSpy).toHaveBeenCalledTimes(2);
+     expect(fillCellSpy).toHaveBeenCalledWith(10,10);
+     expect(fillCellSpy).toHaveBeenCalledWith(12,11)
+     expect(clearCellSpy).toHaveBeenCalledTimes(2);
+     expect(clearCellSpy).toHaveBeenCalledWith(9,11);
+     expect(clearCellSpy).toHaveBeenCalledWith(11,10);
+
     component.stop()
   }));
+
+  it('should support zoom-in', () => {
+    // create glider
+    createGliderTest()
+
+    spyCanvasDrawService.getGrid = jasmine.createSpy().and.callThrough()
+    const fillCellSpy = spyCanvasDrawService.fillCell = jasmine.createSpy().and.callThrough()
+    const setCellSize = spyCanvasDrawService.setCellSize = jasmine.createSpy().and.callThrough()
+
+    // act 1 - perform zoom
+    component.doZoomIn()
+
+    // assert
+    expect(setCellSize).toHaveBeenCalledTimes(1);
+
+    // initial zoomlevel is 10 and 5 is constant delta
+    expect(setCellSize).toHaveBeenCalledOnceWith(15);
+
+    // assure the default glider is drawn again
+    //      08 09 10 11 12
+    //  08 |__|__|__|__|__|
+    //  09 |__|__|__|##|__|
+    //  10 |__|##|__|##|__|
+    //  11 |__|__|##|##|__|
+    //  12 |__|__|__|__|__|
+    expect(fillCellSpy).toHaveBeenCalledTimes(5);
+    expect(fillCellSpy).toHaveBeenCalledWith(9, 11)
+    expect(fillCellSpy).toHaveBeenCalledWith(10, 9)
+    expect(fillCellSpy).toHaveBeenCalledWith(10, 11)
+    expect(fillCellSpy).toHaveBeenCalledWith(11, 10)
+    expect(fillCellSpy).toHaveBeenCalledWith(11, 11)
+  })
+
+  it('should support zoom-out', () => {
+    // create glider
+    createGliderTest()
+
+    spyCanvasDrawService.getGrid = jasmine.createSpy().and.callThrough()
+    const fillCellSpy = spyCanvasDrawService.fillCell = jasmine.createSpy().and.callThrough()
+    const setCellSize = spyCanvasDrawService.setCellSize = jasmine.createSpy().and.callThrough()
+
+    // act 1 - perform zoom
+    component.doZoomOut()
+
+    // assert
+    expect(setCellSize).toHaveBeenCalledTimes(1);
+
+    // initial zoomlevel is 10 and 5 is constant delta
+    expect(setCellSize).toHaveBeenCalledOnceWith(5);
+
+    // assure the default glider is drawn again
+    //      08 09 10 11 12
+    //  08 |__|__|__|__|__|
+    //  09 |__|__|__|##|__|
+    //  10 |__|##|__|##|__|
+    //  11 |__|__|##|##|__|
+    //  12 |__|__|__|__|__|
+    expect(fillCellSpy).toHaveBeenCalledTimes(5);
+    expect(fillCellSpy).toHaveBeenCalledWith(9, 11)
+    expect(fillCellSpy).toHaveBeenCalledWith(10, 9)
+    expect(fillCellSpy).toHaveBeenCalledWith(10, 11)
+    expect(fillCellSpy).toHaveBeenCalledWith(11, 10)
+    expect(fillCellSpy).toHaveBeenCalledWith(11, 11)
+  })
+
+  it('should support pan-up', () => {
+    // create glider
+    createGliderTest()
+
+    spyCanvasDrawService.getGrid = jasmine.createSpy().and.callThrough()
+    const fillCellSpy = spyCanvasDrawService.fillCell = jasmine.createSpy().and.callThrough()
+    const moveUpSpy = spyCanvasDrawService.moveUp = jasmine.createSpy().and.callThrough()
+
+    // act 1 - perform zoom
+    component.moveUp()
+
+    // assert
+    expect(moveUpSpy).toHaveBeenCalledTimes(1);
+
+    // move rate constant and it is 20
+    expect(moveUpSpy).toHaveBeenCalledOnceWith(20);
+
+    // assure the default glider is drawn again
+    //      08 09 10 11 12
+    //  08 |__|__|__|__|__|
+    //  09 |__|__|__|##|__|
+    //  10 |__|##|__|##|__|
+    //  11 |__|__|##|##|__|
+    //  12 |__|__|__|__|__|
+    expect(fillCellSpy).toHaveBeenCalledTimes(5);
+    expect(fillCellSpy).toHaveBeenCalledWith(9, 11)
+    expect(fillCellSpy).toHaveBeenCalledWith(10, 9)
+    expect(fillCellSpy).toHaveBeenCalledWith(10, 11)
+    expect(fillCellSpy).toHaveBeenCalledWith(11, 10)
+    expect(fillCellSpy).toHaveBeenCalledWith(11, 11)
+  })
 });
