@@ -107,6 +107,7 @@ describe('GolCanvasComponent-Glider', () => {
     expect(fillCellSpy).toHaveBeenCalledWith(10, 11)
     expect(fillCellSpy).toHaveBeenCalledWith(11, 10)
     expect(fillCellSpy).toHaveBeenCalledWith(11, 11)
+    expect(component.generationCount).toBe(1)
 
     // reset spy data
     resetGridSpy.calls.reset()
@@ -157,6 +158,7 @@ describe('GolCanvasComponent-Glider', () => {
     expect(clearCellSpy).toHaveBeenCalledTimes(2);
     expect(clearCellSpy).toHaveBeenCalledWith(9, 11);
     expect(clearCellSpy).toHaveBeenCalledWith(10, 9);
+    expect(component.generationCount).toBe(2)
 
     // reset spy data
     resetGridSpy.calls.reset()
@@ -185,6 +187,7 @@ describe('GolCanvasComponent-Glider', () => {
     expect(clearCellSpy).toHaveBeenCalledTimes(2);
     expect(clearCellSpy).toHaveBeenCalledWith(9, 10);
     expect(clearCellSpy).toHaveBeenCalledWith(10, 11);
+    expect(component.generationCount).toBe(3)
 
     // reset spy data
     resetGridSpy.calls.reset()
@@ -214,6 +217,7 @@ describe('GolCanvasComponent-Glider', () => {
     expect(clearCellSpy).toHaveBeenCalledTimes(2);
     expect(clearCellSpy).toHaveBeenCalledWith(9, 11);
     expect(clearCellSpy).toHaveBeenCalledWith(11, 10);
+    expect(component.generationCount).toBe(4)
 
     component.stop()
   }));

@@ -16,6 +16,8 @@ export class GolCanvasComponent implements OnInit {
   private moveChangeRate: number = 20;
   private generationDuration = 300;
 
+  generationCount = 0
+
   // canvas properties
   zoomLevel = 25;
   gridWidth = 1500;
@@ -126,6 +128,7 @@ export class GolCanvasComponent implements OnInit {
   private createInitialState(lives: CanvasCell[]) {
     // stop the ongoing execution
     this.stop();
+    this.generationCount = 1
 
     // reset lives data
     this.allLives = new Map<string, CellLife>();
@@ -171,6 +174,9 @@ export class GolCanvasComponent implements OnInit {
 
     // find delta and pass it on to updateCellsOnCanvass method
     this.updateCellsOnCanvass(newDeads, newBorn);
+
+    // increment generation count
+    this.generationCount += 1
 
     // schedule itself to be run in next 1s
     this.timeoutToken = setTimeout(

@@ -22,8 +22,6 @@ export class GolCanvasDrawService {
       this.ctx = newCtxValue;
 
       // init with proper values
-      this.ctx.lineWidth = 0.4
-      this.ctx.strokeStyle = "black"
       this.ctx.fillStyle = "rgba(255,0,0,0.75)"
     }
     else {
@@ -73,41 +71,36 @@ export class GolCanvasDrawService {
   moveUp(delta: number) {
     this.grid.verticalCenter += delta
     const originalVerticalCenter = this.grid.height / 2;
-    if (this.grid.verticalCenter - originalVerticalCenter >= this.grid.cellSize) {
-      this.grid.centerRow = this.grid.centerRow - 1;
-      this.grid.verticalCenter = this.grid.verticalCenter - this.grid.cellSize;
-    }
-
+    const rebalancingData = this.getOffsetRebalancingData(this.grid.verticalCenter - originalVerticalCenter, this.grid.cellSize)
+    this.grid.centerRow -= rebalancingData[0]
+    this.grid.verticalCenter = originalVerticalCenter + rebalancingData[1]
     this.refresh();
   }
 
   moveDown(delta: number) {
     this.grid.verticalCenter -= delta
     const originalVerticalCenter = this.grid.height / 2;
-    if (originalVerticalCenter - this.grid.verticalCenter >= this.grid.cellSize) {
-      this.grid.centerRow = this.grid.centerRow + 1;
-      this.grid.verticalCenter = this.grid.verticalCenter + this.grid.cellSize;
-    }
+    const rebalancingData = this.getOffsetRebalancingData(originalVerticalCenter - this.grid.verticalCenter, this.grid.cellSize)
+    this.grid.centerRow += rebalancingData[0]
+    this.grid.verticalCenter = originalVerticalCenter - rebalancingData[1]
     this.refresh();
   }
 
   moveLeft(delta: number) {
     this.grid.horizontalCenter += delta
     const originalHorizontalCenter = this.grid.width / 2;
-    if (this.grid.horizontalCenter - originalHorizontalCenter >= this.grid.cellSize) {
-      this.grid.centerCol = this.grid.centerCol - 1;
-      this.grid.horizontalCenter = this.grid.horizontalCenter - this.grid.cellSize;
-    }
+    const rebalancingData = this.getOffsetRebalancingData(this.grid.horizontalCenter - originalHorizontalCenter, this.grid.cellSize)
+    this.grid.centerCol -= rebalancingData[0]
+    this.grid.horizontalCenter = originalHorizontalCenter + rebalancingData[1]
     this.refresh();
   }
 
   moveRight(delta: number) {
     this.grid.horizontalCenter -= delta
     const originalHorizontalCenter = this.grid.height / 2;
-    if (originalHorizontalCenter - this.grid.horizontalCenter >= this.grid.cellSize) {
-      this.grid.centerCol = this.grid.centerCol + 1;
-      this.grid.horizontalCenter = this.grid.horizontalCenter + this.grid.cellSize;
-    }
+    const rebalancingData = this.getOffsetRebalancingData(originalHorizontalCenter - this.grid.horizontalCenter, this.grid.cellSize)
+    this.grid.centerCol += rebalancingData[0]
+    this.grid.horizontalCenter = originalHorizontalCenter - rebalancingData[1]
     this.refresh();
   }
 
@@ -149,12 +142,8 @@ export class GolCanvasDrawService {
 
   private refresh() {
     this.clearAll();
-    this.beginPath();
-
     this.drawHorizontalLines();
     this.drawVerticalLines();
-
-    this.closePath();
   }
 
   private drawHorizontalLines() {
@@ -233,7 +222,11 @@ export class GolCanvasDrawService {
     this.grid.rightCol -= 1;
 
     // last column width
-    this.grid.rightColWidth = x > this.grid.width ? x - this.grid.width : this.grid.cellSize;
+    this.grid.rightColWidth = x > this.grid.width ? this.grid.width - x + this.grid.cellSize : this.grid.cellSize;
+  }
+
+  private getOffsetRebalancingData(offset: number, cellSize: number): number[] {
+    return offset >= cellSize ? [Math.floor(offset / cellSize), offset % cellSize] : [0, offset]
   }
 
   private isCellOnCanvas(row: number, col: number): boolean {
@@ -258,9 +251,13 @@ export class GolCanvasDrawService {
   }
 
   private drawGridLine(x1: number, y1: number, x2: number, y2: number) {
+    this.beginPath()
     this.ctx.moveTo(x1, y1)
     this.ctx.lineTo(x2, y2)
+    this.ctx.strokeStyle = "grey"
+    this.ctx.lineWidth = 0.2
     this.ctx.stroke()
+    this.closePath()
   }
 
   private fillRect(x: number, y: number, width: number, height: number) {

@@ -29,8 +29,7 @@ describe('GolCanvasDrawService', () => {
     // act
     service.setCanvas(htmlCanvasSpy, 150, 110, 10)
 
-    // assert
-    expect(canvasContextSpy.lineWidth).toBe(0.4)
+    // assert    
     expect(canvasContextSpy.clearRect).toHaveBeenCalledTimes(1)
 
     // horizontal lines (11) + vertical lines (15)
@@ -233,6 +232,179 @@ describe('GolCanvasDrawService', () => {
     expect(canvasContextSpy.stroke).toHaveBeenCalledTimes(26)
 
     // ensure no life is painted
+    expect(canvasContextSpy.fillRect).toHaveBeenCalledTimes(0)
+
+  })
+
+  it('moveUp should move the grid up by given amount', () => {
+
+    // arrange
+    setupGridWithOneLife()
+    canvasContextSpy.clearRect.calls.reset()
+    canvasContextSpy.stroke.calls.reset()
+    canvasContextSpy.fillRect.calls.reset()
+
+    // act
+    service.moveUp(15)
+    const grid = service.getGrid()
+
+    // assert
+    expect(grid.centerRow).toBe(9)
+    expect(grid.topRow).toBe(4)
+    expect(grid.bottomRow).toBe(14)
+    expect(grid.verticalCenter).toBe(60)
+
+    // assure column data is unchanged
+    expect(grid.centerCol).toBe(10)
+
+    // assert redraw
+    expect(canvasContextSpy.clearRect).toHaveBeenCalledOnceWith(0, 0, 150, 110)
+
+    // horizontal lines (10) + vertical lines (15)
+    expect(canvasContextSpy.stroke).toHaveBeenCalledTimes(25)
+
+    // ensure no life is painted without explicitcall
+    expect(canvasContextSpy.fillRect).toHaveBeenCalledTimes(0)
+
+  })
+
+  it('moveDown should move the grid down by given amount', () => {
+
+    // arrange
+    setupGridWithOneLife()
+    canvasContextSpy.clearRect.calls.reset()
+    canvasContextSpy.stroke.calls.reset()
+    canvasContextSpy.fillRect.calls.reset()
+
+    // act
+    service.moveDown(10)
+    const grid = service.getGrid()
+
+    // assert
+    expect(grid.centerRow).toBe(11)
+    expect(grid.topRow).toBe(6)
+    expect(grid.bottomRow).toBe(17)
+    expect(grid.verticalCenter).toBe(55)
+
+    // assure column data is unchanged
+    expect(grid.centerCol).toBe(10)
+
+    // assert redraw
+    expect(canvasContextSpy.clearRect).toHaveBeenCalledOnceWith(0, 0, 150, 110)
+
+    // horizontal lines (11) + vertical lines (15)
+    expect(canvasContextSpy.stroke).toHaveBeenCalledTimes(26)
+
+    // ensure no life is painted without explicitcall
+    expect(canvasContextSpy.fillRect).toHaveBeenCalledTimes(0)
+
+  })
+
+  it('moveLeft should move the grid left by given amount', () => {
+
+    // arrange
+    setupGridWithOneLife()
+    canvasContextSpy.clearRect.calls.reset()
+    canvasContextSpy.stroke.calls.reset()
+    canvasContextSpy.fillRect.calls.reset()
+
+    // act
+    service.moveLeft(20)
+    const grid = service.getGrid()
+
+    // assert
+    expect(grid.centerCol).toBe(8)
+    expect(grid.leftCol).toBe(1)
+    expect(grid.rightCol).toBe(16)
+    expect(grid.horizontalCenter).toBe(75)
+
+    // assure row data is unchanged
+    expect(grid.centerRow).toBe(10)
+
+    // assert redraw
+    expect(canvasContextSpy.clearRect).toHaveBeenCalledOnceWith(0, 0, 150, 110)
+
+    // horizontal lines (11) + vertical lines (15)
+    expect(canvasContextSpy.stroke).toHaveBeenCalledTimes(26)
+
+    // ensure no life is painted without explicitcall
+    expect(canvasContextSpy.fillRect).toHaveBeenCalledTimes(0)
+
+  })
+
+  it('moveRight should move the grid right by given amount', () => {
+
+    // arrange
+    setupGridWithOneLife()
+    canvasContextSpy.clearRect.calls.reset()
+    canvasContextSpy.stroke.calls.reset()
+    canvasContextSpy.fillRect.calls.reset()
+
+    // act
+    service.moveRight(2)
+    const grid = service.getGrid()
+
+    // assert
+    expect(grid.centerCol).toBe(10)
+    expect(grid.leftCol).toBe(3)
+    expect(grid.rightCol).toBe(18)
+    expect(grid.horizontalCenter).toBe(73)
+
+    // assure row data is unchanged
+    expect(grid.centerRow).toBe(10)
+
+    // assert redraw
+    expect(canvasContextSpy.clearRect).toHaveBeenCalledOnceWith(0, 0, 150, 110)
+
+    // horizontal lines (11) + vertical lines (15)
+    expect(canvasContextSpy.stroke).toHaveBeenCalledTimes(26)
+
+    // ensure no life is painted without explicitcall
+    expect(canvasContextSpy.fillRect).toHaveBeenCalledTimes(0)
+
+  })
+
+  it('setCellSize should resize the grid cells to given amount', () => {
+
+    // arrange
+    setupGridWithOneLife()
+    canvasContextSpy.clearRect.calls.reset()
+    canvasContextSpy.stroke.calls.reset()
+    canvasContextSpy.fillRect.calls.reset()
+
+    // act
+    service.setCellSize(20)
+    const grid = service.getGrid()
+
+    // assert
+    expect(grid.cellSize).toBe(20)
+    expect(grid.centerRow).toBe(10)
+    expect(grid.centerCol).toBe(10)
+
+    // center row (10) + 1 - complete rows (2) - partial top row (1)
+    expect(grid.topRow).toBe(10 + 1 - 2 - 1)
+
+    // center row (10) + complete rows (2) + partial bottom row (1)
+    expect(grid.bottomRow).toBe(10 + 2 + 1)
+
+    // center col (10) + 1 - complete cols (3) - partial left col (1)
+    expect(grid.leftCol).toBe(10 + 1 - 3 - 1)
+
+    // center col (10) + complete cols (3) + partial right col (1)
+    expect(grid.rightCol).toBe(10 + 3 + 1)
+
+    expect(grid.topRowHeight).toBe(15)
+    expect(grid.bottomRowHeight).toBe(15)
+    expect(grid.leftColWidth).toBe(15)
+    expect(grid.rightColWidth).toBe(15)
+
+    // assert redraw
+    expect(canvasContextSpy.clearRect).toHaveBeenCalledOnceWith(0, 0, 150, 110)
+
+    // horizontal lines (5) + vertical lines (7)
+    expect(canvasContextSpy.stroke).toHaveBeenCalledTimes(12)
+
+    // ensure no life is painted without explicitcall
     expect(canvasContextSpy.fillRect).toHaveBeenCalledTimes(0)
 
   })
