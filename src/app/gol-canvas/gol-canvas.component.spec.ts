@@ -54,9 +54,9 @@ describe('GolCanvasComponent-Glider', () => {
         return (
           !!actual &&
           (actual as ElementRef<HTMLCanvasElement>).nativeElement !==
-            undefined &&
+          undefined &&
           (actual as ElementRef<HTMLCanvasElement>).nativeElement.getContext !==
-            undefined
+          undefined
         );
       },
     };
@@ -64,7 +64,7 @@ describe('GolCanvasComponent-Glider', () => {
     const setConvasSpy = spyOn(spyCanvasDrawService, 'setCanvas').and.callThrough()
 
     // arrange small test canvas
-    component.setInitValues(150,110, 10, 3000);
+    component.setInitValues(150, 110, 10, 3000);
 
     // act1 - onInit
     component.ngOnInit();
@@ -80,7 +80,7 @@ describe('GolCanvasComponent-Glider', () => {
     setConvasSpy.calls.reset();
   }
 
-  function createGliderTest(){
+  function createGliderTest() {
     // arrange
     testSetup()
 
@@ -88,7 +88,7 @@ describe('GolCanvasComponent-Glider', () => {
     const resetGridSpy = spyOn(spyCanvasDrawService, 'resetGrid').and.callThrough()
     const fillCellSpy = spyOn(spyCanvasDrawService, 'fillCell').and.callThrough()
     const clearCellSpy = spyOn(spyCanvasDrawService, 'clearCell').and.callThrough()
-    
+
     // act - create glider in below position
     component.createGlider()
 
@@ -107,7 +107,7 @@ describe('GolCanvasComponent-Glider', () => {
     expect(fillCellSpy).toHaveBeenCalledWith(10, 11)
     expect(fillCellSpy).toHaveBeenCalledWith(11, 10)
     expect(fillCellSpy).toHaveBeenCalledWith(11, 11)
-    
+
     // reset spy data
     resetGridSpy.calls.reset()
     fillCellSpy.calls.reset()
@@ -117,7 +117,7 @@ describe('GolCanvasComponent-Glider', () => {
 
   it('app should create glider correctly', createGliderTest);
 
-  it('should be created and moved correctly', fakeAsync(() => {
+  it('should be created and lived correctly', fakeAsync(() => {
 
     createGliderTest()
 
@@ -135,9 +135,9 @@ describe('GolCanvasComponent-Glider', () => {
     //  |__|##|##|__|__|
     //  |__|__|__|__|__|
 
-    
+
     component.start()
-    
+
     // assure
     // there should be two deaths and two births
     // 00 is death, and 11 is birth in below illustration
@@ -152,11 +152,11 @@ describe('GolCanvasComponent-Glider', () => {
 
     expect(resetGridSpy).toHaveBeenCalledTimes(0)
     expect(fillCellSpy).toHaveBeenCalledTimes(2);
-    expect(fillCellSpy).toHaveBeenCalledWith(9,10);
-    expect(fillCellSpy).toHaveBeenCalledWith(10,12)
+    expect(fillCellSpy).toHaveBeenCalledWith(9, 10);
+    expect(fillCellSpy).toHaveBeenCalledWith(10, 12)
     expect(clearCellSpy).toHaveBeenCalledTimes(2);
-    expect(clearCellSpy).toHaveBeenCalledWith(9,11);
-    expect(clearCellSpy).toHaveBeenCalledWith(10,9);
+    expect(clearCellSpy).toHaveBeenCalledWith(9, 11);
+    expect(clearCellSpy).toHaveBeenCalledWith(10, 9);
 
     // reset spy data
     resetGridSpy.calls.reset()
@@ -180,40 +180,40 @@ describe('GolCanvasComponent-Glider', () => {
 
     expect(resetGridSpy).toHaveBeenCalledTimes(0)
     expect(fillCellSpy).toHaveBeenCalledTimes(2);
-    expect(fillCellSpy).toHaveBeenCalledWith(9,11);
-    expect(fillCellSpy).toHaveBeenCalledWith(11,12)
+    expect(fillCellSpy).toHaveBeenCalledWith(9, 11);
+    expect(fillCellSpy).toHaveBeenCalledWith(11, 12)
     expect(clearCellSpy).toHaveBeenCalledTimes(2);
-    expect(clearCellSpy).toHaveBeenCalledWith(9,10);
-    expect(clearCellSpy).toHaveBeenCalledWith(10,11);
+    expect(clearCellSpy).toHaveBeenCalledWith(9, 10);
+    expect(clearCellSpy).toHaveBeenCalledWith(10, 11);
 
     // reset spy data
     resetGridSpy.calls.reset()
     fillCellSpy.calls.reset()
     clearCellSpy.calls.reset()
 
-     // act 4
-     tick(3000)
+    // act 4
+    tick(3000)
 
-     // assure
-     // there should be two deaths and two births
-     // 00 is death, and 11 is birth in below illustration
-     // ## is unchanged
-     // 
-     //      08 09 10 11 12 13
-     //  08 |__|__|__|__|__|__|
-     //  09 |__|__|__|00|__|__|
-     //  10 |__|__|11|__|##|__|
-     //  11 |__|__|00|##|##|__|
-     //  12 |__|__|__|11|__|__|
-     //  13 |__|__|__|__|__|__| 
+    // assure
+    // there should be two deaths and two births
+    // 00 is death, and 11 is birth in below illustration
+    // ## is unchanged
+    // 
+    //      08 09 10 11 12 13
+    //  08 |__|__|__|__|__|__|
+    //  09 |__|__|__|00|__|__|
+    //  10 |__|__|11|__|##|__|
+    //  11 |__|__|00|##|##|__|
+    //  12 |__|__|__|11|__|__|
+    //  13 |__|__|__|__|__|__| 
 
-     expect(resetGridSpy).toHaveBeenCalledTimes(0)
-     expect(fillCellSpy).toHaveBeenCalledTimes(2);
-     expect(fillCellSpy).toHaveBeenCalledWith(10,10);
-     expect(fillCellSpy).toHaveBeenCalledWith(12,11)
-     expect(clearCellSpy).toHaveBeenCalledTimes(2);
-     expect(clearCellSpy).toHaveBeenCalledWith(9,11);
-     expect(clearCellSpy).toHaveBeenCalledWith(11,10);
+    expect(resetGridSpy).toHaveBeenCalledTimes(0)
+    expect(fillCellSpy).toHaveBeenCalledTimes(2);
+    expect(fillCellSpy).toHaveBeenCalledWith(10, 10);
+    expect(fillCellSpy).toHaveBeenCalledWith(12, 11)
+    expect(clearCellSpy).toHaveBeenCalledTimes(2);
+    expect(clearCellSpy).toHaveBeenCalledWith(9, 11);
+    expect(clearCellSpy).toHaveBeenCalledWith(11, 10);
 
     component.stop()
   }));
@@ -298,6 +298,102 @@ describe('GolCanvasComponent-Glider', () => {
 
     // move rate constant and it is 20
     expect(moveUpSpy).toHaveBeenCalledOnceWith(20);
+
+    // assure the default glider is drawn again
+    //      08 09 10 11 12
+    //  08 |__|__|__|__|__|
+    //  09 |__|__|__|##|__|
+    //  10 |__|##|__|##|__|
+    //  11 |__|__|##|##|__|
+    //  12 |__|__|__|__|__|
+    expect(fillCellSpy).toHaveBeenCalledTimes(5);
+    expect(fillCellSpy).toHaveBeenCalledWith(9, 11)
+    expect(fillCellSpy).toHaveBeenCalledWith(10, 9)
+    expect(fillCellSpy).toHaveBeenCalledWith(10, 11)
+    expect(fillCellSpy).toHaveBeenCalledWith(11, 10)
+    expect(fillCellSpy).toHaveBeenCalledWith(11, 11)
+  })
+
+  it('should support pan-right', () => {
+    // create glider
+    createGliderTest()
+
+    spyCanvasDrawService.getGrid = jasmine.createSpy().and.callThrough()
+    const fillCellSpy = spyCanvasDrawService.fillCell = jasmine.createSpy().and.callThrough()
+    const moveRightSpy = spyCanvasDrawService.moveRight = jasmine.createSpy().and.callThrough()
+
+    // act 1 - perform zoom
+    component.moveRight()
+
+    // assert
+    expect(moveRightSpy).toHaveBeenCalledTimes(1);
+
+    // move rate constant and it is 20
+    expect(moveRightSpy).toHaveBeenCalledOnceWith(20);
+
+    // assure the default glider is drawn again
+    //      08 09 10 11 12
+    //  08 |__|__|__|__|__|
+    //  09 |__|__|__|##|__|
+    //  10 |__|##|__|##|__|
+    //  11 |__|__|##|##|__|
+    //  12 |__|__|__|__|__|
+    expect(fillCellSpy).toHaveBeenCalledTimes(5);
+    expect(fillCellSpy).toHaveBeenCalledWith(9, 11)
+    expect(fillCellSpy).toHaveBeenCalledWith(10, 9)
+    expect(fillCellSpy).toHaveBeenCalledWith(10, 11)
+    expect(fillCellSpy).toHaveBeenCalledWith(11, 10)
+    expect(fillCellSpy).toHaveBeenCalledWith(11, 11)
+  })
+
+  it('should support pan-left', () => {
+    // create glider
+    createGliderTest()
+
+    spyCanvasDrawService.getGrid = jasmine.createSpy().and.callThrough()
+    const fillCellSpy = spyCanvasDrawService.fillCell = jasmine.createSpy().and.callThrough()
+    const moveLeftSpy = spyCanvasDrawService.moveLeft = jasmine.createSpy().and.callThrough()
+
+    // act 1 - perform zoom
+    component.moveLeft()
+
+    // assert
+    expect(moveLeftSpy).toHaveBeenCalledTimes(1);
+
+    // move rate constant and it is 20
+    expect(moveLeftSpy).toHaveBeenCalledOnceWith(20);
+
+    // assure the default glider is drawn again
+    //      08 09 10 11 12
+    //  08 |__|__|__|__|__|
+    //  09 |__|__|__|##|__|
+    //  10 |__|##|__|##|__|
+    //  11 |__|__|##|##|__|
+    //  12 |__|__|__|__|__|
+    expect(fillCellSpy).toHaveBeenCalledTimes(5);
+    expect(fillCellSpy).toHaveBeenCalledWith(9, 11)
+    expect(fillCellSpy).toHaveBeenCalledWith(10, 9)
+    expect(fillCellSpy).toHaveBeenCalledWith(10, 11)
+    expect(fillCellSpy).toHaveBeenCalledWith(11, 10)
+    expect(fillCellSpy).toHaveBeenCalledWith(11, 11)
+  })
+
+  it('should support pan-down', () => {
+    // create glider
+    createGliderTest()
+
+    spyCanvasDrawService.getGrid = jasmine.createSpy().and.callThrough()
+    const fillCellSpy = spyCanvasDrawService.fillCell = jasmine.createSpy().and.callThrough()
+    const moveDownSpy = spyCanvasDrawService.moveDown = jasmine.createSpy().and.callThrough()
+
+    // act 1 - perform zoom
+    component.moveDown()
+
+    // assert
+    expect(moveDownSpy).toHaveBeenCalledTimes(1);
+
+    // move rate constant and it is 20
+    expect(moveDownSpy).toHaveBeenCalledOnceWith(20);
 
     // assure the default glider is drawn again
     //      08 09 10 11 12

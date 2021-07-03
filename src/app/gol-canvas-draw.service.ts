@@ -7,16 +7,15 @@ import { GolGrid } from './gol-grid';
   providedIn: 'root'
 })
 export class GolCanvasDrawService {
-  private grid!:GolGrid  
+  private grid!: GolGrid
   private cellMargin = 1
   private canvas!: ElementRef<HTMLCanvasElement>;
   private ctx!: CanvasRenderingContext2D;
   constructor() { }
 
-  setCanvas(canvas: ElementRef<HTMLCanvasElement>, width: number, height: number, cellSize:number) {
+  setCanvas(canvas: ElementRef<HTMLCanvasElement>, width: number, height: number, cellSize: number) {
     this.canvas = canvas
     this.grid = new GolGrid(width, height, cellSize)
-    this.grid.cellSize = 25
 
     const newCtxValue = this.canvas.nativeElement.getContext('2d')
     if (newCtxValue != null) {
@@ -29,81 +28,49 @@ export class GolCanvasDrawService {
     }
     else {
       // throw error
-      return;
+      throw new Error('Canvas context not found')
     }
 
     this.refresh()
   }
 
-  getGrid(){
+  getGrid() {
     return this.grid
   }
 
-  beginPath() {
-    this.ctx.beginPath()
-  }
-
-  closePath() {
-    this.ctx.closePath()
-  }
-
-  drawGridLine(x1: number, y1: number, x2: number, y2: number) {
-    this.ctx.moveTo(x1, y1)
-    this.ctx.lineTo(x2, y2)
-    this.ctx.stroke()
-  }
-
-  fillRect(x: number, y: number, width: number, height: number) {
-    this.beginPath()
-    this.ctx.fillRect(x + this.cellMargin, y + this.cellMargin, width - this.cellMargin, height - this.cellMargin)
-    this.closePath()
-  }
-
-  clearRect(x: number, y: number, width: number, height: number) {
-    this.beginPath()
-    this.ctx.clearRect(x + this.cellMargin, y + this.cellMargin, width - this.cellMargin, height - this.cellMargin)
-    this.closePath()
-  }
-
-  fillCell(row:number, col:number) :boolean {
-    if (!this.isCellOnCanvas(row,col)) {
+  fillCell(row: number, col: number): boolean {
+    if (!this.isCellOnCanvas(row, col)) {
       return false;
     }
 
     const cell = this.getCanvasCellCordinates(row, col);
 
-    this.fillRect(cell.x, cell.y, cell.width, cell.height);
-    console.log(cell.x + '|' + cell.y + '|' + cell.width + '|' + cell.height);
+    this.fillRect(cell.x + this.cellMargin, cell.y + this.cellMargin, cell.width - this.cellMargin, cell.height - this.cellMargin);
+    // console.log(cell.x + '|' + cell.y + '|' + cell.width + '|' + cell.height);
 
     return true
   }
 
-  clearCell(row:number, col:number):boolean {
-    if (!this.isCellOnCanvas(row,col)) {
+  clearCell(row: number, col: number): boolean {
+    if (!this.isCellOnCanvas(row, col)) {
       return false;
     }
 
     const cell = this.getCanvasCellCordinates(row, col);
 
-    this.clearRect(cell.x, cell.y, cell.width, cell.height);
-    console.log(
-      'Cleared :' + cell.x + '|' + cell.y + '|' + cell.width + '|' + cell.height
-    );
+    this.clearRect(cell.x + this.cellMargin, cell.y + this.cellMargin, cell.width - this.cellMargin, cell.height - this.cellMargin);
+    // console.log(
+    //   'Cleared :' + cell.x + '|' + cell.y + '|' + cell.width + '|' + cell.height
+    // );
 
     return true
   }
 
-  resetGrid(){
+  resetGrid() {
     this.refresh()
   }
 
-   clearAll() {
-    this.beginPath()
-    this.ctx.clearRect(0, 0, this.grid.width, this.grid.height)
-    this.closePath()
-  }
-
-  moveUp(delta:number) {
+  moveUp(delta: number) {
     this.grid.verticalCenter += delta
     const originalVerticalCenter = this.grid.height / 2;
     if (this.grid.verticalCenter - originalVerticalCenter >= this.grid.cellSize) {
@@ -114,7 +81,7 @@ export class GolCanvasDrawService {
     this.refresh();
   }
 
-  moveDown(delta:number) {
+  moveDown(delta: number) {
     this.grid.verticalCenter -= delta
     const originalVerticalCenter = this.grid.height / 2;
     if (originalVerticalCenter - this.grid.verticalCenter >= this.grid.cellSize) {
@@ -124,7 +91,7 @@ export class GolCanvasDrawService {
     this.refresh();
   }
 
-  moveLeft(delta:number) {
+  moveLeft(delta: number) {
     this.grid.horizontalCenter += delta
     const originalHorizontalCenter = this.grid.width / 2;
     if (this.grid.horizontalCenter - originalHorizontalCenter >= this.grid.cellSize) {
@@ -134,7 +101,7 @@ export class GolCanvasDrawService {
     this.refresh();
   }
 
-  moveRight(delta:number) {
+  moveRight(delta: number) {
     this.grid.horizontalCenter -= delta
     const originalHorizontalCenter = this.grid.height / 2;
     if (originalHorizontalCenter - this.grid.horizontalCenter >= this.grid.cellSize) {
@@ -144,12 +111,12 @@ export class GolCanvasDrawService {
     this.refresh();
   }
 
-  setCellSize(value:number) {
+  setCellSize(value: number) {
     this.grid.cellSize = value
     this.refresh()
   }
 
-  private getCanvasCellCordinates(row:number, col:number): CanvasCell {
+  private getCanvasCellCordinates(row: number, col: number): CanvasCell {
     const xoffset = col > this.grid.leftCol ? this.grid.leftColWidth : 0;
     const xcols =
       col <= this.grid.leftCol + 1 ? 0 : col - this.grid.leftCol - 1;
@@ -180,14 +147,14 @@ export class GolCanvasDrawService {
     return result;
   }
 
-  private refresh(){
+  private refresh() {
     this.clearAll();
     this.beginPath();
 
     this.drawHorizontalLines();
     this.drawVerticalLines();
 
-    this.closePath();   
+    this.closePath();
   }
 
   private drawHorizontalLines() {
@@ -267,14 +234,44 @@ export class GolCanvasDrawService {
 
     // last column width
     this.grid.rightColWidth = x > this.grid.width ? x - this.grid.width : this.grid.cellSize;
-
   }
 
-  private isCellOnCanvas(row:number, col:number): boolean {
+  private isCellOnCanvas(row: number, col: number): boolean {
     return row >= this.grid.topRow &&
       row <= this.grid.bottomRow &&
       col >= this.grid.leftCol &&
       col <= this.grid.rightCol
-    
+  }
+
+  private beginPath() {
+    this.ctx.beginPath()
+  }
+
+  private closePath() {
+    this.ctx.closePath()
+  }
+
+  private clearAll() {
+    this.beginPath()
+    this.ctx.clearRect(0, 0, this.grid.width, this.grid.height)
+    this.closePath()
+  }
+
+  private drawGridLine(x1: number, y1: number, x2: number, y2: number) {
+    this.ctx.moveTo(x1, y1)
+    this.ctx.lineTo(x2, y2)
+    this.ctx.stroke()
+  }
+
+  private fillRect(x: number, y: number, width: number, height: number) {
+    this.beginPath()
+    this.ctx.fillRect(x, y, width, height)
+    this.closePath()
+  }
+
+  private clearRect(x: number, y: number, width: number, height: number) {
+    this.beginPath()
+    this.ctx.clearRect(x, y, width, height)
+    this.closePath()
   }
 }
