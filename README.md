@@ -1,27 +1,13 @@
-# ConwaysGameOfLife
+# Conway's Game Of Life
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 12.0.3.
+The application can be accessd at - https://iamsurajgharat.github.io/conways-game-of-life/
 
-## Development server
+## Concept
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+The application gives a pictorial view of the cellular automation devised by the British mathematician John Conway. As of now, the application only supports certain fixed shapes such as Blinker, Glider and Pulsar etc., but in future I would like to build an ability for users to draw any initial shape onto the screen on which the automation rules would be applied.
 
-## Code scaffolding
+For more details about the concept in general, please visit [wikipedia](https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life).
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+## Why
 
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+The primary intention behind this project was to learn front end technologies such as Javascript, Typescript, and Angular, to the extent where I could start building complete end to end applications, and deploy it on any available cloud.
