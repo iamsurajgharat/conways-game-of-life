@@ -1,30 +1,39 @@
-<canvas #canvas class="myCanvas" width="1500" height="600">
-    <p>Add suitable fallback here.</p>
-</canvas>
-<div class="canvas-controls">
-    <div>
-        <p>Generations : {{generationCount}}</p>
-        Zoom level : {{zoomLevel}} [Rows :{{getGrid().topRow}} to {{getGrid().bottomRow}}, and columns =
-        {{getGrid().leftCol}} to {{getGrid().rightCol}}]
-        <p>
-            Total rows : {{getGrid().getRowsCount()}}
-            Total cols : {{getGrid().getColsCount()}}
-            &nbsp;Top row height : {{getGrid().topRowHeight}}
-            &nbsp;Bottom row height : {{getGrid().bottomRowHeight}}
-        </p>
+<div style="height: 100%;" autofocus>
+    <canvas #canvas class="myCanvas" width="1500" height="600">
+        <p>Add suitable fallback here.</p>
+    </canvas>
+    <div class="canvas-controls">
+        <div>
+            <p>Generations : {{generationCount}}</p>
+            Zoom level : {{zoomLevel}} [Rows :{{getGrid().topRow}} to {{getGrid().bottomRow}}, and columns =
+            {{getGrid().leftCol}} to {{getGrid().rightCol}}]
+            <p>
+                Total rows : {{getGrid().getRowsCount()}}
+                Total cols : {{getGrid().getColsCount()}}
+                &nbsp;Top row height : {{getGrid().topRowHeight}}
+                &nbsp;Bottom row height : {{getGrid().bottomRowHeight}}
+            </p>
+            <p>Please refer <a href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life" target="_blank">wiki</a>,
+                for conceptual
+                overview. Select any one of below preconfigured shapes, and then click on Start button. Use arrow keys
+                to pan, and + and - keys to
+                zoom in and out
+                respectively.</p>
+        </div>
+        <div class="shapes">
+            <button (click)="createOscillator()">Blinker</button>
+            <button (click)="createToad()">Toad</button>
+            <button (click)="createPulsar()">Pulsar</button>
+            <button (click)="createGlider()">Glider</button>
+            <button (click)="createLightWeightSpaceship()">LWSS</button>
+            <button (click)="createHeavyWeightSpaceship()">HWSS</button>
+        </div>
+        <div class="controls">
+            <button (click)="toggleStartStop()" [disabled]="!status">{{(status == 'Started' ? 'Stop' :
+                'Start')}}</button>
+            <button (click)="next()" [disabled]="status != 'Stopped'">Next</button>
+        </div>
+
     </div>
-    <div>
-        <button (click)="createOscillator()">Oscillator</button>
-        <button (click)="createGlider()">Glider</button>
-    </div>
-    <div>
-        <button (click)="start()">Start</button>
-        <button (click)="stop()">Stop</button>
-        <button (click)="doZoomIn()">Zoom in</button>
-        <button (click)="doZoomOut()">Zoom out</button>
-        <button (click)="moveUp()">Pan up</button>
-        <button (click)="moveDown()">Pan Down</button>
-        <button (click)="moveLeft()">Pan Left</button>
-        <button (click)="moveRight()">Pan Right</button>
-    </div>
+
 </div>

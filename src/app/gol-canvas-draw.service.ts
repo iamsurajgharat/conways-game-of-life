@@ -8,9 +8,11 @@ import { GolGrid } from './gol-grid';
 })
 export class GolCanvasDrawService {
   private grid!: GolGrid
-  private cellMargin = 1
   private canvas!: ElementRef<HTMLCanvasElement>;
   private ctx!: CanvasRenderingContext2D;
+
+  cellMargin = 2
+
   constructor() { }
 
   setCanvas(canvas: ElementRef<HTMLCanvasElement>, width: number, height: number, cellSize: number) {
@@ -22,7 +24,7 @@ export class GolCanvasDrawService {
       this.ctx = newCtxValue;
 
       // init with proper values
-      this.ctx.fillStyle = "rgba(255,0,0,0.75)"
+
     }
     else {
       // throw error
@@ -57,6 +59,11 @@ export class GolCanvasDrawService {
     const cell = this.getCanvasCellCordinates(row, col);
 
     this.clearRect(cell.x + this.cellMargin, cell.y + this.cellMargin, cell.width - this.cellMargin, cell.height - this.cellMargin);
+
+    // this.beginPath()
+    // this.ctx.fillStyle = "rgba(255,0,0,0.25)"
+    // this.ctx.fillRect(cell.x + this.cellMargin, cell.y + this.cellMargin, cell.width - this.cellMargin, cell.height - this.cellMargin)
+    // this.closePath()
     // console.log(
     //   'Cleared :' + cell.x + '|' + cell.y + '|' + cell.width + '|' + cell.height
     // );
@@ -129,9 +136,9 @@ export class GolCanvasDrawService {
     const height =
       row == this.grid.topRow
         ? this.grid.topRowHeight
-        : row == this.grid.bottomRow
+        : (row == this.grid.bottomRow
           ? this.grid.bottomRowHeight
-          : this.grid.cellSize;
+          : this.grid.cellSize)
     const result = new CanvasCell(row, col)
     result.x = x
     result.y = y
@@ -255,13 +262,14 @@ export class GolCanvasDrawService {
     this.ctx.moveTo(x1, y1)
     this.ctx.lineTo(x2, y2)
     this.ctx.strokeStyle = "grey"
-    this.ctx.lineWidth = 0.2
+    this.ctx.lineWidth = 0.3
     this.ctx.stroke()
     this.closePath()
   }
 
   private fillRect(x: number, y: number, width: number, height: number) {
     this.beginPath()
+    this.ctx.fillStyle = "rgba(0,0,255,0.75)"
     this.ctx.fillRect(x, y, width, height)
     this.closePath()
   }

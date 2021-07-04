@@ -2,6 +2,7 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CanvasCell } from '../canvas-cell';
 import { CellLife } from '../cell-life';
 import { GolCanvasDrawService } from '../gol-canvas-draw.service';
+import { HostListener } from '@angular/core';
 
 @Component({
   selector: 'app-gol-canvas',
@@ -16,6 +17,8 @@ export class GolCanvasComponent implements OnInit {
   private moveChangeRate: number = 20;
   private generationDuration = 300;
 
+
+  status: undefined | 'Started' | 'Stopped'
   generationCount = 0
 
   // canvas properties
@@ -65,6 +68,98 @@ export class GolCanvasComponent implements OnInit {
     this.createInitialState(lives);
   }
 
+  createPulsar() {
+    // pular
+    const lives: CanvasCell[] = [];
+
+    // top-left
+    lives.push(new CanvasCell(this.getGrid().centerRow - 6, this.getGrid().centerCol - 4))
+    lives.push(new CanvasCell(this.getGrid().centerRow - 6, this.getGrid().centerCol - 3))
+    lives.push(new CanvasCell(this.getGrid().centerRow - 6, this.getGrid().centerCol - 2))
+
+    lives.push(new CanvasCell(this.getGrid().centerRow - 4, this.getGrid().centerCol - 6))
+    lives.push(new CanvasCell(this.getGrid().centerRow - 3, this.getGrid().centerCol - 6))
+    lives.push(new CanvasCell(this.getGrid().centerRow - 2, this.getGrid().centerCol - 6))
+
+    lives.push(new CanvasCell(this.getGrid().centerRow - 4, this.getGrid().centerCol - 1))
+    lives.push(new CanvasCell(this.getGrid().centerRow - 3, this.getGrid().centerCol - 1))
+    lives.push(new CanvasCell(this.getGrid().centerRow - 2, this.getGrid().centerCol - 1))
+
+    lives.push(new CanvasCell(this.getGrid().centerRow - 1, this.getGrid().centerCol - 4))
+    lives.push(new CanvasCell(this.getGrid().centerRow - 1, this.getGrid().centerCol - 3))
+    lives.push(new CanvasCell(this.getGrid().centerRow - 1, this.getGrid().centerCol - 2))
+
+
+    // top-right
+    lives.push(new CanvasCell(this.getGrid().centerRow - 6, this.getGrid().centerCol + 4))
+    lives.push(new CanvasCell(this.getGrid().centerRow - 6, this.getGrid().centerCol + 3))
+    lives.push(new CanvasCell(this.getGrid().centerRow - 6, this.getGrid().centerCol + 2))
+
+    lives.push(new CanvasCell(this.getGrid().centerRow - 4, this.getGrid().centerCol + 6))
+    lives.push(new CanvasCell(this.getGrid().centerRow - 3, this.getGrid().centerCol + 6))
+    lives.push(new CanvasCell(this.getGrid().centerRow - 2, this.getGrid().centerCol + 6))
+
+    lives.push(new CanvasCell(this.getGrid().centerRow - 4, this.getGrid().centerCol + 1))
+    lives.push(new CanvasCell(this.getGrid().centerRow - 3, this.getGrid().centerCol + 1))
+    lives.push(new CanvasCell(this.getGrid().centerRow - 2, this.getGrid().centerCol + 1))
+
+    lives.push(new CanvasCell(this.getGrid().centerRow - 1, this.getGrid().centerCol + 4))
+    lives.push(new CanvasCell(this.getGrid().centerRow - 1, this.getGrid().centerCol + 3))
+    lives.push(new CanvasCell(this.getGrid().centerRow - 1, this.getGrid().centerCol + 2))
+
+
+    // bottom-left
+    lives.push(new CanvasCell(this.getGrid().centerRow + 1, this.getGrid().centerCol - 4))
+    lives.push(new CanvasCell(this.getGrid().centerRow + 1, this.getGrid().centerCol - 3))
+    lives.push(new CanvasCell(this.getGrid().centerRow + 1, this.getGrid().centerCol - 2))
+
+    lives.push(new CanvasCell(this.getGrid().centerRow + 2, this.getGrid().centerCol - 6))
+    lives.push(new CanvasCell(this.getGrid().centerRow + 3, this.getGrid().centerCol - 6))
+    lives.push(new CanvasCell(this.getGrid().centerRow + 4, this.getGrid().centerCol - 6))
+
+    lives.push(new CanvasCell(this.getGrid().centerRow + 2, this.getGrid().centerCol - 1))
+    lives.push(new CanvasCell(this.getGrid().centerRow + 3, this.getGrid().centerCol - 1))
+    lives.push(new CanvasCell(this.getGrid().centerRow + 4, this.getGrid().centerCol - 1))
+
+    lives.push(new CanvasCell(this.getGrid().centerRow + 6, this.getGrid().centerCol - 4))
+    lives.push(new CanvasCell(this.getGrid().centerRow + 6, this.getGrid().centerCol - 3))
+    lives.push(new CanvasCell(this.getGrid().centerRow + 6, this.getGrid().centerCol - 2))
+
+
+    // bottom-right
+    lives.push(new CanvasCell(this.getGrid().centerRow + 1, this.getGrid().centerCol + 4))
+    lives.push(new CanvasCell(this.getGrid().centerRow + 1, this.getGrid().centerCol + 3))
+    lives.push(new CanvasCell(this.getGrid().centerRow + 1, this.getGrid().centerCol + 2))
+
+    lives.push(new CanvasCell(this.getGrid().centerRow + 2, this.getGrid().centerCol + 6))
+    lives.push(new CanvasCell(this.getGrid().centerRow + 3, this.getGrid().centerCol + 6))
+    lives.push(new CanvasCell(this.getGrid().centerRow + 4, this.getGrid().centerCol + 6))
+
+    lives.push(new CanvasCell(this.getGrid().centerRow + 2, this.getGrid().centerCol + 1))
+    lives.push(new CanvasCell(this.getGrid().centerRow + 3, this.getGrid().centerCol + 1))
+    lives.push(new CanvasCell(this.getGrid().centerRow + 4, this.getGrid().centerCol + 1))
+
+    lives.push(new CanvasCell(this.getGrid().centerRow + 6, this.getGrid().centerCol + 4))
+    lives.push(new CanvasCell(this.getGrid().centerRow + 6, this.getGrid().centerCol + 3))
+    lives.push(new CanvasCell(this.getGrid().centerRow + 6, this.getGrid().centerCol + 2))
+
+    this.createInitialState(lives);
+  }
+
+  createToad() {
+    // toad
+    const c1 = new CanvasCell(this.getGrid().centerRow - 1, this.getGrid().centerCol - 1);
+    const c2 = new CanvasCell(this.getGrid().centerRow - 1, this.getGrid().centerCol);
+    const c3 = new CanvasCell(this.getGrid().centerRow - 1, this.getGrid().centerCol + 1);
+    const c4 = new CanvasCell(this.getGrid().centerRow, this.getGrid().centerCol - 2);
+    const c5 = new CanvasCell(this.getGrid().centerRow, this.getGrid().centerCol - 1);
+    const c6 = new CanvasCell(this.getGrid().centerRow, this.getGrid().centerCol);
+
+    const lives = [c1, c2, c3, c4, c5, c6];
+
+    this.createInitialState(lives);
+  }
+
   createGlider() {
     // glider
     const c1 = new CanvasCell(this.getGrid().centerRow - 1, this.getGrid().centerCol + 1);
@@ -78,9 +173,88 @@ export class GolCanvasComponent implements OnInit {
     this.createInitialState(lives);
   }
 
+  createLightWeightSpaceship() {
+    // LWSS
+    const c1 = new CanvasCell(this.getGrid().centerRow - 2, this.getGrid().centerCol - 2);
+    const c2 = new CanvasCell(this.getGrid().centerRow - 2, this.getGrid().centerCol + 1);
+    const c3 = new CanvasCell(this.getGrid().centerRow - 1, this.getGrid().centerCol + 2);
+    const c4 = new CanvasCell(this.getGrid().centerRow, this.getGrid().centerCol - 2);
+    const c5 = new CanvasCell(this.getGrid().centerRow, this.getGrid().centerCol + 2);
+    const c6 = new CanvasCell(this.getGrid().centerRow + 1, this.getGrid().centerCol - 1);
+    const c7 = new CanvasCell(this.getGrid().centerRow + 1, this.getGrid().centerCol);
+    const c8 = new CanvasCell(this.getGrid().centerRow + 1, this.getGrid().centerCol + 1);
+    const c9 = new CanvasCell(this.getGrid().centerRow + 1, this.getGrid().centerCol + 2);
+
+    const lives = [c1, c2, c3, c4, c5, c6, c7, c8, c9];
+
+    this.createInitialState(lives);
+  }
+
+  createHeavyWeightSpaceship() {
+    // HWSS
+    const c1 = new CanvasCell(this.getGrid().centerRow - 2, this.getGrid().centerCol);
+    const c2 = new CanvasCell(this.getGrid().centerRow - 2, this.getGrid().centerCol + 1);
+    const c3 = new CanvasCell(this.getGrid().centerRow - 1, this.getGrid().centerCol - 2);
+    const c4 = new CanvasCell(this.getGrid().centerRow - 1, this.getGrid().centerCol + 3);
+    const c5 = new CanvasCell(this.getGrid().centerRow, this.getGrid().centerCol - 3);
+    const c6 = new CanvasCell(this.getGrid().centerRow + 1, this.getGrid().centerCol - 3);
+    const c7 = new CanvasCell(this.getGrid().centerRow + 1, this.getGrid().centerCol + 3);
+    const c8 = new CanvasCell(this.getGrid().centerRow + 2, this.getGrid().centerCol - 3);
+    const c9 = new CanvasCell(this.getGrid().centerRow + 2, this.getGrid().centerCol - 2);
+    const c10 = new CanvasCell(this.getGrid().centerRow + 2, this.getGrid().centerCol - 1);
+    const c11 = new CanvasCell(this.getGrid().centerRow + 2, this.getGrid().centerCol);
+    const c12 = new CanvasCell(this.getGrid().centerRow + 2, this.getGrid().centerCol + 1);
+    const c13 = new CanvasCell(this.getGrid().centerRow + 2, this.getGrid().centerCol + 2);
+
+    const lives = [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12, c13];
+
+    this.createInitialState(lives);
+  }
+
+
+
+  @HostListener('document:keydown', ['$event.key'])
+  handleKeyboardEvent(keyPressed: string) {
+    switch (keyPressed) {
+      case 'ArrowUp':
+        this.moveUp()
+        break;
+      case 'ArrowDown':
+        this.moveDown()
+        break;
+      case 'ArrowLeft':
+        this.moveLeft()
+        break;
+      case 'ArrowRight':
+        this.moveRight()
+        break;
+      case '+':
+        this.doZoomIn()
+        break;
+      case '-':
+        this.doZoomOut()
+        break;
+    }
+  }
+
+  toggleStartStop() {
+    if (this.status == 'Started') {
+      this.stop()
+      this.status = 'Stopped'
+    }
+    else {
+      this.start()
+      this.status = 'Started'
+    }
+  }
+
+  next() {
+    this.createNextGeneration(false);
+  }
+
   start() {
     //requestAnimationFrame(() => this.createNextGeneration())
-    this.createNextGeneration();
+    this.createNextGeneration(true);
   }
 
   stop() {
@@ -129,6 +303,7 @@ export class GolCanvasComponent implements OnInit {
     // stop the ongoing execution
     this.stop();
     this.generationCount = 1
+    this.status = 'Stopped'
 
     // reset lives data
     this.allLives = new Map<string, CellLife>();
@@ -149,7 +324,7 @@ export class GolCanvasComponent implements OnInit {
     }
   }
 
-  private createNextGeneration() {
+  private createNextGeneration(reschedule: boolean) {
     //this.fillCell(new CanvasCell(18, 25))
 
     // process each life in allLives state, and its surroundings
@@ -179,10 +354,13 @@ export class GolCanvasComponent implements OnInit {
     this.generationCount += 1
 
     // schedule itself to be run in next 1s
-    this.timeoutToken = setTimeout(
-      () => this.createNextGeneration(),
-      this.generationDuration
-    );
+    if (reschedule) {
+      this.timeoutToken = setTimeout(
+        () => this.createNextGeneration(reschedule),
+        this.generationDuration
+      );
+    }
+
     //requestAnimationFrame(() => this.createNextGeneration())
   }
 

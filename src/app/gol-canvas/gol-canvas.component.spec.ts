@@ -231,7 +231,7 @@ describe('GolCanvasComponent-Glider', () => {
     const setCellSize = spyCanvasDrawService.setCellSize = jasmine.createSpy().and.callThrough()
 
     // act 1 - perform zoom
-    component.doZoomIn()
+    component.handleKeyboardEvent('+')
 
     // assert
     expect(setCellSize).toHaveBeenCalledTimes(1);
@@ -263,7 +263,7 @@ describe('GolCanvasComponent-Glider', () => {
     const setCellSize = spyCanvasDrawService.setCellSize = jasmine.createSpy().and.callThrough()
 
     // act 1 - perform zoom
-    component.doZoomOut()
+    component.handleKeyboardEvent('-')
 
     // assert
     expect(setCellSize).toHaveBeenCalledTimes(1);
@@ -295,7 +295,7 @@ describe('GolCanvasComponent-Glider', () => {
     const moveUpSpy = spyCanvasDrawService.moveUp = jasmine.createSpy().and.callThrough()
 
     // act 1 - perform zoom
-    component.moveUp()
+    component.handleKeyboardEvent('ArrowUp')
 
     // assert
     expect(moveUpSpy).toHaveBeenCalledTimes(1);
@@ -327,7 +327,7 @@ describe('GolCanvasComponent-Glider', () => {
     const moveRightSpy = spyCanvasDrawService.moveRight = jasmine.createSpy().and.callThrough()
 
     // act 1 - perform zoom
-    component.moveRight()
+    component.handleKeyboardEvent('ArrowRight')
 
     // assert
     expect(moveRightSpy).toHaveBeenCalledTimes(1);
@@ -359,7 +359,7 @@ describe('GolCanvasComponent-Glider', () => {
     const moveLeftSpy = spyCanvasDrawService.moveLeft = jasmine.createSpy().and.callThrough()
 
     // act 1 - perform zoom
-    component.moveLeft()
+    component.handleKeyboardEvent('ArrowLeft')
 
     // assert
     expect(moveLeftSpy).toHaveBeenCalledTimes(1);
@@ -391,7 +391,7 @@ describe('GolCanvasComponent-Glider', () => {
     const moveDownSpy = spyCanvasDrawService.moveDown = jasmine.createSpy().and.callThrough()
 
     // act 1 - perform zoom
-    component.moveDown()
+    component.handleKeyboardEvent('ArrowDown')
 
     // assert
     expect(moveDownSpy).toHaveBeenCalledTimes(1);
@@ -414,3 +414,402 @@ describe('GolCanvasComponent-Glider', () => {
     expect(fillCellSpy).toHaveBeenCalledWith(11, 11)
   })
 });
+
+
+describe('GolCanvasComponent-Blinker', () => {
+  let component: GolCanvasComponent;
+  let fixture: ComponentFixture<GolCanvasComponent>;
+
+  let spyCanvasDrawService = new GolCanvasDrawService()
+
+  beforeEach(() => {
+    // configure TestBed to create component with mock canvas service
+    TestBed.configureTestingModule({
+      declarations: [GolCanvasComponent],
+
+      providers: [
+        { provide: GolCanvasDrawService, useValue: spyCanvasDrawService },
+      ],
+    });
+
+    fixture = TestBed.createComponent(GolCanvasComponent);
+    component = fixture.componentInstance;
+
+    //fixture.detectChanges();
+  });
+
+  function testSetup() {
+    var customCanvasElementEqualityTester = {
+      asymmetricMatch: function (actual: any) {
+        return (
+          !!actual &&
+          (actual as ElementRef<HTMLCanvasElement>).nativeElement !==
+          undefined &&
+          (actual as ElementRef<HTMLCanvasElement>).nativeElement.getContext !==
+          undefined
+        );
+      },
+    };
+
+    const setConvasSpy = spyOn(spyCanvasDrawService, 'setCanvas').and.callThrough()
+
+    // arrange small test canvas
+    component.setInitValues(150, 110, 10, 3000);
+
+    // act1 - onInit
+    component.ngOnInit();
+
+    // assure
+    expect(spyCanvasDrawService.setCanvas).toHaveBeenCalledOnceWith(
+      customCanvasElementEqualityTester,
+      150,
+      110,
+      10
+    );
+
+    setConvasSpy.calls.reset();
+  }
+
+
+  it('app should create blinker correctly', () => {
+    // arrange
+    testSetup()
+
+    spyOn(spyCanvasDrawService, 'getGrid').and.callThrough()
+    const resetGridSpy = spyOn(spyCanvasDrawService, 'resetGrid').and.callThrough()
+    const fillCellSpy = spyOn(spyCanvasDrawService, 'fillCell').and.callThrough()
+    const clearCellSpy = spyOn(spyCanvasDrawService, 'clearCell').and.callThrough()
+
+    // act - create glider in below position
+    component.createOscillator()
+
+    // assure
+    expect(resetGridSpy).toHaveBeenCalledTimes(1);
+    expect(fillCellSpy).toHaveBeenCalledTimes(3);
+    expect(component.generationCount).toBe(1)
+
+    // reset spy data
+    resetGridSpy.calls.reset()
+    fillCellSpy.calls.reset()
+  });
+})
+
+describe('GolCanvasComponent-Toad', () => {
+  let component: GolCanvasComponent;
+  let fixture: ComponentFixture<GolCanvasComponent>;
+
+  let spyCanvasDrawService = new GolCanvasDrawService()
+
+  beforeEach(() => {
+    // configure TestBed to create component with mock canvas service
+    TestBed.configureTestingModule({
+      declarations: [GolCanvasComponent],
+
+      providers: [
+        { provide: GolCanvasDrawService, useValue: spyCanvasDrawService },
+      ],
+    });
+
+    fixture = TestBed.createComponent(GolCanvasComponent);
+    component = fixture.componentInstance;
+
+    //fixture.detectChanges();
+  });
+
+  function testSetup() {
+    var customCanvasElementEqualityTester = {
+      asymmetricMatch: function (actual: any) {
+        return (
+          !!actual &&
+          (actual as ElementRef<HTMLCanvasElement>).nativeElement !==
+          undefined &&
+          (actual as ElementRef<HTMLCanvasElement>).nativeElement.getContext !==
+          undefined
+        );
+      },
+    };
+
+    const setConvasSpy = spyOn(spyCanvasDrawService, 'setCanvas').and.callThrough()
+
+    // arrange small test canvas
+    component.setInitValues(150, 110, 10, 3000);
+
+    // act1 - onInit
+    component.ngOnInit();
+
+    // assure
+    expect(spyCanvasDrawService.setCanvas).toHaveBeenCalledOnceWith(
+      customCanvasElementEqualityTester,
+      150,
+      110,
+      10
+    );
+
+    setConvasSpy.calls.reset();
+  }
+
+
+  it('app should create toaad correctly', () => {
+    // arrange
+    testSetup()
+
+    spyOn(spyCanvasDrawService, 'getGrid').and.callThrough()
+    const resetGridSpy = spyOn(spyCanvasDrawService, 'resetGrid').and.callThrough()
+    const fillCellSpy = spyOn(spyCanvasDrawService, 'fillCell').and.callThrough()
+    const clearCellSpy = spyOn(spyCanvasDrawService, 'clearCell').and.callThrough()
+
+    // act - create glider in below position
+    component.createToad()
+
+    // assure
+    expect(resetGridSpy).toHaveBeenCalledTimes(1);
+    expect(fillCellSpy).toHaveBeenCalledTimes(6);
+    expect(component.generationCount).toBe(1)
+
+    // reset spy data
+    resetGridSpy.calls.reset()
+    fillCellSpy.calls.reset()
+  });
+
+
+});
+
+describe('GolCanvasComponent-Pulsar', () => {
+  let component: GolCanvasComponent;
+  let fixture: ComponentFixture<GolCanvasComponent>;
+
+  let spyCanvasDrawService = new GolCanvasDrawService()
+
+  beforeEach(() => {
+    // configure TestBed to create component with mock canvas service
+    TestBed.configureTestingModule({
+      declarations: [GolCanvasComponent],
+
+      providers: [
+        { provide: GolCanvasDrawService, useValue: spyCanvasDrawService },
+      ],
+    });
+
+    fixture = TestBed.createComponent(GolCanvasComponent);
+    component = fixture.componentInstance;
+
+    //fixture.detectChanges();
+  });
+
+  function testSetup() {
+    var customCanvasElementEqualityTester = {
+      asymmetricMatch: function (actual: any) {
+        return (
+          !!actual &&
+          (actual as ElementRef<HTMLCanvasElement>).nativeElement !==
+          undefined &&
+          (actual as ElementRef<HTMLCanvasElement>).nativeElement.getContext !==
+          undefined
+        );
+      },
+    };
+
+    const setConvasSpy = spyOn(spyCanvasDrawService, 'setCanvas').and.callThrough()
+
+    // arrange small test canvas
+    component.setInitValues(150, 110, 10, 3000);
+
+    // act1 - onInit
+    component.ngOnInit();
+
+    // assure
+    expect(spyCanvasDrawService.setCanvas).toHaveBeenCalledOnceWith(
+      customCanvasElementEqualityTester,
+      150,
+      110,
+      10
+    );
+
+    setConvasSpy.calls.reset();
+  }
+
+
+  it('app should create pulsar correctly', () => {
+    // arrange
+    testSetup()
+
+    spyOn(spyCanvasDrawService, 'getGrid').and.callThrough()
+    const resetGridSpy = spyOn(spyCanvasDrawService, 'resetGrid').and.callThrough()
+    const fillCellSpy = spyOn(spyCanvasDrawService, 'fillCell').and.callThrough()
+
+    // act - create glider in below position
+    component.createPulsar()
+
+    // assure
+    expect(resetGridSpy).toHaveBeenCalledTimes(1);
+    expect(fillCellSpy).toHaveBeenCalledTimes(48);
+    expect(component.generationCount).toBe(1)
+
+    // reset spy data
+    resetGridSpy.calls.reset()
+    fillCellSpy.calls.reset()
+  });
+
+
+});
+
+
+describe('GolCanvasComponent-lwss', () => {
+  let component: GolCanvasComponent;
+  let fixture: ComponentFixture<GolCanvasComponent>;
+
+  let spyCanvasDrawService = new GolCanvasDrawService()
+
+  beforeEach(() => {
+    // configure TestBed to create component with mock canvas service
+    TestBed.configureTestingModule({
+      declarations: [GolCanvasComponent],
+
+      providers: [
+        { provide: GolCanvasDrawService, useValue: spyCanvasDrawService },
+      ],
+    });
+
+    fixture = TestBed.createComponent(GolCanvasComponent);
+    component = fixture.componentInstance;
+
+    //fixture.detectChanges();
+  });
+
+  function testSetup() {
+    var customCanvasElementEqualityTester = {
+      asymmetricMatch: function (actual: any) {
+        return (
+          !!actual &&
+          (actual as ElementRef<HTMLCanvasElement>).nativeElement !==
+          undefined &&
+          (actual as ElementRef<HTMLCanvasElement>).nativeElement.getContext !==
+          undefined
+        );
+      },
+    };
+
+    const setConvasSpy = spyOn(spyCanvasDrawService, 'setCanvas').and.callThrough()
+
+    // arrange small test canvas
+    component.setInitValues(150, 110, 10, 3000);
+
+    // act1 - onInit
+    component.ngOnInit();
+
+    // assure
+    expect(spyCanvasDrawService.setCanvas).toHaveBeenCalledOnceWith(
+      customCanvasElementEqualityTester,
+      150,
+      110,
+      10
+    );
+
+    setConvasSpy.calls.reset();
+  }
+
+
+  it('app should create lwss correctly', () => {
+    // arrange
+    testSetup()
+
+    spyOn(spyCanvasDrawService, 'getGrid').and.callThrough()
+    const resetGridSpy = spyOn(spyCanvasDrawService, 'resetGrid').and.callThrough()
+    const fillCellSpy = spyOn(spyCanvasDrawService, 'fillCell').and.callThrough()
+
+    // act - create glider in below position
+    component.createLightWeightSpaceship()
+
+    // assure
+    expect(resetGridSpy).toHaveBeenCalledTimes(1);
+    expect(fillCellSpy).toHaveBeenCalledTimes(9);
+    expect(component.generationCount).toBe(1)
+
+    // reset spy data
+    resetGridSpy.calls.reset()
+    fillCellSpy.calls.reset()
+  });
+
+
+});
+
+
+describe('GolCanvasComponent-hwss', () => {
+  let component: GolCanvasComponent;
+  let fixture: ComponentFixture<GolCanvasComponent>;
+
+  let spyCanvasDrawService = new GolCanvasDrawService()
+
+  beforeEach(() => {
+    // configure TestBed to create component with mock canvas service
+    TestBed.configureTestingModule({
+      declarations: [GolCanvasComponent],
+
+      providers: [
+        { provide: GolCanvasDrawService, useValue: spyCanvasDrawService },
+      ],
+    });
+
+    fixture = TestBed.createComponent(GolCanvasComponent);
+    component = fixture.componentInstance;
+
+    //fixture.detectChanges();
+  });
+
+  function testSetup() {
+    var customCanvasElementEqualityTester = {
+      asymmetricMatch: function (actual: any) {
+        return (
+          !!actual &&
+          (actual as ElementRef<HTMLCanvasElement>).nativeElement !==
+          undefined &&
+          (actual as ElementRef<HTMLCanvasElement>).nativeElement.getContext !==
+          undefined
+        );
+      },
+    };
+
+    const setConvasSpy = spyOn(spyCanvasDrawService, 'setCanvas').and.callThrough()
+
+    // arrange small test canvas
+    component.setInitValues(150, 110, 10, 3000);
+
+    // act1 - onInit
+    component.ngOnInit();
+
+    // assure
+    expect(spyCanvasDrawService.setCanvas).toHaveBeenCalledOnceWith(
+      customCanvasElementEqualityTester,
+      150,
+      110,
+      10
+    );
+
+    setConvasSpy.calls.reset();
+  }
+
+
+  it('app should create hwss correctly', () => {
+    // arrange
+    testSetup()
+
+    spyOn(spyCanvasDrawService, 'getGrid').and.callThrough()
+    const resetGridSpy = spyOn(spyCanvasDrawService, 'resetGrid').and.callThrough()
+    const fillCellSpy = spyOn(spyCanvasDrawService, 'fillCell').and.callThrough()
+
+    // act - create glider in below position
+    component.createHeavyWeightSpaceship()
+
+    // assure
+    expect(resetGridSpy).toHaveBeenCalledTimes(1);
+    expect(fillCellSpy).toHaveBeenCalledTimes(13);
+    expect(component.generationCount).toBe(1)
+
+    // reset spy data
+    resetGridSpy.calls.reset()
+    fillCellSpy.calls.reset()
+  });
+
+
+});
+

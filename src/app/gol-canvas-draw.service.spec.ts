@@ -110,7 +110,7 @@ describe('GolCanvasDrawService', () => {
     // similarly, visible columns are 3 to 18, out of which left column is partly visible
     // thats why 10th col would start at 5 + (6*10), horizontally
     // the extra 1 is a fixed margin, 
-    expect(canvasContextSpy.fillRect).toHaveBeenCalledOnceWith(65 + 1, 45 + 1, 10 - 1, 10 - 1)
+    expect(canvasContextSpy.fillRect).toHaveBeenCalledOnceWith(65 + service.cellMargin, 45 + service.cellMargin, 10 - service.cellMargin, 10 - service.cellMargin)
 
   })
 
@@ -131,7 +131,7 @@ describe('GolCanvasDrawService', () => {
     // similarly, visible columns are 3 to 18, out of which left column is partly visible
     // thats why 10th col would start at 5 + (6*10), horizontally
     // the extra 1 is a fixed margin, 
-    expect(canvasContextSpy.fillRect).toHaveBeenCalledOnceWith(65 + 1, 0 + 1, 10 - 1, 5 - 1)
+    expect(canvasContextSpy.fillRect).toHaveBeenCalledOnceWith(65 + service.cellMargin, 0 + service.cellMargin, 10 - service.cellMargin, 5 - service.cellMargin)
 
     new Array().forEach(element => {
 
@@ -163,7 +163,7 @@ describe('GolCanvasDrawService', () => {
 
       // visible rows are from 5 to 16, and out of which top and bottom rows are partly visible
       // similarly, visible columns are 3 to 18, out of which left most and right columns are partly visible
-      expect(canvasContextSpy.fillRect).toHaveBeenCalledOnceWith(x + 1, y + 1, width - 1, height - 1)
+      expect(canvasContextSpy.fillRect).toHaveBeenCalledOnceWith(x + service.cellMargin, y + service.cellMargin, width - service.cellMargin, height - service.cellMargin)
 
     })
   })
@@ -203,7 +203,7 @@ describe('GolCanvasDrawService', () => {
 
       // visible rows are from 5 to 16, and out of which top and bottom rows are partly visible
       // similarly, visible columns are 3 to 18, out of which left most and right columns are partly visible
-      expect(canvasContextSpy.clearRect).toHaveBeenCalledOnceWith(x + 1, y + 1, width - 1, height - 1)
+      expect(canvasContextSpy.clearRect).toHaveBeenCalledOnceWith(x + service.cellMargin, y + service.cellMargin, width - service.cellMargin, height - service.cellMargin)
 
     })
   })

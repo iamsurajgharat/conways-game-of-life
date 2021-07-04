@@ -1,12 +1,31 @@
-.myCanvas{
-    border-style: solid;
-    border-color: red;
-    width: 98%;
-    height: 85%;
-    margin:auto;
-    
+.myCanvas {
+  border-style: solid;
+  border-color: black;
+  width: 98%;
+  height: 80%;
+  margin: auto;
 }
 
-.canvas-controls{
-    height: 15%;
+.canvas-controls {
+  height: 15%;
+}
+
+button {
+  margin-top: 20px;
+  background-color: #eee;
+  padding: 1rem;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+button:hover {
+  background-color: #cfd8dc;
+}
+
+.shapes {
+  text-align: center;
+}
+
+.controls {
+  text-align: center;
 }
